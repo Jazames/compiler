@@ -1,0 +1,27 @@
+
+
+
+Compilers typically have the following flow structure: 
+
+Parse the language, interpreting it as some sort of intermediate representation that can map directly to assembly. 
+Run optimizations on the intermediate language.
+Convert the intermediate language into machine code. Sometimes this stage has small optimizations when there are some machine codes that are shortcuts of other machine codes. 
+
+
+Scanner: Transform character stream into tokens. 
+Parser: Transform token stream into syntax tree.
+
+For our compiler, the intermediate language will be the backend language, so the backend is trivial. 
+The Scanner should take me about 100 lines of code. 
+
+Flex is the tool for building scanner.
+Bison is the tool for building parser.
+
+Characters => |Scanner| => Tokens => |Parse| => Abstract Syntax Tree => |Front End| => Data Flow Graph/Intermediate Code => |Optimizer| => Better Data Flow Graph/Better Intermediate Code => |Back End| => output file/machine code
+
+
+Imperitive vs Declarative : C++ vs Prolog
+High level vs Low level: C vs Python
+
+
+

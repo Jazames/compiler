@@ -1,0 +1,100 @@
+
+Do not need to be expert in MIPS 
+Microprocessor without Interlocked Pipeline Stages
+Pretty much the very first RISC architecture (Reduced Instruction Set)
+Common in Embedded Systems
+
+Signed integers are stored as 2's complement
+Unsigned integers are stored as binary. 
+  Signed and unsigned integers cannot safely touch each other. 
+Original MIPS did not have floating point numbers. 
+  We're not doing anything with floats, so we're done here!
+
+
+Load/Store instructions
+  Registers start with $
+li - load immediate
+  li $27, 42
+la - load address //used for strings and functions calles
+  la $s0, label
+lw - load word
+  lw $dest, $target(offset) 
+sw - store word
+  
+
+
+Arithmetic
+add, addi, addu, addiu
+add, add immediate, add unsigned, add immediate unsigned
+  add $dest, $op1, $op2
+  addi $dest, $op1, literal
+
+
+//Multiply and Divide both store their result in a special 64-bit register. 
+mult, multu
+ mulst $op1, $op2
+div, divu
+
+mfhi, mflow - Used to get results of mult and div, gets high and low 32 bits of 64-bit register
+  //For division, the low bits hold the remainder, the high bits hold the result.
+
+Conditionals
+slt, sltu, slti, sltiu
+  set less than, set less than unsigned, set less than immediate, set less than immediate unsigned
+and andi //bitwise and
+or, ori
+
+
+Branching
+beq, bne
+  branch equal, branch not equal
+j, jr, jal
+  jump, jump register, jump and link
+  jump - goto
+  jump register - take value in a register, treat it as an address, and go to it. 
+  jump and link - 
+
+Reserved
+$zero - Always 0 isn't a real register, but it's a ground wire. Always reads 0. 
+$at - Assembler Temporary. DO NOT TOUCH THIS
+$k0, $k1 - They are for the kernel. DO NOT TOUCH THEM EITHER.
+
+Variables
+$s0 - $s7 - Saved Registers. - These registers should be saved after a function call. 
+$t0 - $t9 - Temporary Registers.  - These registers can be modified after a function call. 
+
+Function Calls
+$v0, $v1 - Return values from function calls
+$a0 - $a3 - Arguments for function calls
+$ra - return address - set by jal
+
+Memory Management
+$gp - Global Pointer - 
+$sp - Stack Pointer - points to the top of the stack
+$fp - Frame Pointer - points to the current activation record
+
+Conventions
+The following registers must have the same value after a function call retuns as they had before the functions call:
+  Saved Registers
+  Global Pointer
+  Stack Pointer
+  Frame Pointer
+  Return Address
+
+syscall - not a real MIPS instruction, rather is provided for us by our simulator
+
+I/O provided by simulator
+put system call number into $v0
+  1 - print integer - $a0 contains integer to print
+  4 - print string  - $a0 ...
+
+
+
+Good idea to write functions that can compute distance between 2 points, sum and array, and recursively compute a factorial. 
+
+
+
+
+
+
+
