@@ -1,6 +1,15 @@
 To read this file in chronological order, start at the bottom and read up. 
 
 
+
+
+---------------------------------------------
+Day 3: 
+
+It is reasonable to write out all of the necessary regular expressions this weekend. So attempt to do that. 
+  Not necessary to write all the associated code, just the regexes. Possibly put cout statements? 
+
+
 ---------------------------------------------
 Day 1:
 

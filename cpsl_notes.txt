@@ -1,0 +1,28 @@
+
+Compiler Project Language Source (CPSL)
+
+
+Best reference is definitional paper on cavnas page. 
+
+Keywords: Cannot be mixed case. 
+Note on flex files: %% separates the sections of the flex file. 
+
+Example Flex file
+
+
+%%
+
+//
+do|DO {return DO_TOKEN;} //Keyword example: Whatever is in the curly braces is the code that the scanner generator drops in its code. 
+[A-Za-z][A-Za-z0-9_]* {yylval.stuff = ;yytext  return ID_TOKEN;} //Identifier example. This is kinda tricky. 
+'+' {return ADDITION_TOKEN;} //Operator example. Quotes used to delimit + 
+
+
+%%
+
+
+
+
+
+
+
