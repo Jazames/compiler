@@ -1,0 +1,71 @@
+Language Notes 
+  Notes on what is necessary to have a language
+
+Definitions: 
+  Alphabet: set of symbols
+  Word: sequence of symbols from alphabet
+  Language: set of words
+  Computable Language: there is a recognizing algorithm that can recognize the language. 
+
+Very simplest langauge - The finite language. There is a finite list of words.
+Next Step Up - The regular Language.  
+  Can be recognized by a finite automata. FSM that has a start state, edges are labled with symbols, and if the word ends in an accept state, then it's part of the language. 
+Next Step Up - Context Free Grammar
+  Can be recognized by a push-down automata. FSM with a stack.  
+Another level up - Context Sensitive Grammar
+  Can be recoginized by a FSM with a queue. Or a tape. Or two stacks. All of those give ability to look through entire storage. 
+  There are context sensitive grammars that are no-longer computable. 
+
+Two ways to talk about regular languages. 
+  Regular Expressions
+    Contain 3 operators
+      concatenation
+      alternation
+      Kleene Closure - repetition
+    
+    How to regex a hex number:
+      0x[0-9A-Fa-f][09A-Fa-f]*
+      
+Regular Expressions are a very compact shorthand for finite state machines, and are especially good for accepting text as input. 
+
+Convert a RegEx into a FSM. 
+  1 Start with the regular epxression
+  2 Turn the regular expression into a Non-deterministic Finite Automata.
+    NDFA is a FSM that has edges leaving a state with the same lable and empty transitions. 
+  3 Then Create a Deterministic Finite Automata from the NDFA. 
+  4 From there, optional step to simplify DFA to Minimalistic Deterministic Finite Automata. 
+  
+  Step 1 is named Thompson Construction. It goes like this:
+    Make a rule that the finite automata we build has exactly one START state and exactly one ACCEPT state.
+    Make a rule that the finite automata transitions from START to whatever, and from whatever to ACCEPT. 
+    There are then patterns for each finite expression. 
+      1) Literals (a) 
+        (Start) ==a=> (Accept)
+      2) Concatenation (a+b)
+        (Start_a) ==a=> (Accept_a) ==empty=> (Start_b) ==b=> (Accept_b)
+      3) Alternation (a|b)
+               /==e=> (  ) ==a=> (  ) ==e=>\
+        (Start)                           (Accept)
+               \==e=> (  ) ==b=> (  ) ==e=>/
+      4) Kleene Closure (a*)
+          //<==e===== \\
+          v            \\
+        (  )    ==a=>  (  ) 
+         ||             ||
+         e              e
+         V              V
+        (Start) ==e=> (Accept)
+
+  Step 2 "If this has a name, I don't know what it is." - Dr. Sundberg
+    Turn a NDFA into a DFA
+    Follow the idea "Lets make a new FSM that has states that represent whatever possible choices that could be made"
+    How it's done:
+      1) Label all states. 
+      2) Create a table with a finite number of columns and an infinite number of rows. 
+        Label the first column "state" and the other columns all possible transitions.
+      3) Begin with the start state. For each transition, list the state that it goes to. 
+        For cases where there are multiple transitions with the same lable or an empty transition, combine the states into a new super state thing.
+      4) For each new state or super state added to the table, list the possible transitions out of it. 
+      4.5) Minimizing Can combine rows with identical [transition?] information.
+      5) When all states have had all of their transitions listed, the table now represents a finite state machine. 
+  

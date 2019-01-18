@@ -1,11 +1,17 @@
 
 Compiler Project Language Source (CPSL)
+  
 
 
 Best reference is definitional paper on cavnas page. 
 
 Keywords: Cannot be mixed case. 
+
+flex will recognize "0x" as an integer next to an identifier. This is not a lexical error, but it is a syntax error. 
+  Also, using atoi() is the best way to convert strings to integers. 
+
 Note on flex files: %% separates the sections of the flex file. 
+
 
 Example Flex file
 

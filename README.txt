@@ -83,6 +83,15 @@ Flex file has 3 parts
     Helper code
       This just needs to return some token type. Possibly also return the lexeme, if necessary.
 
+Testing the Scanner:
+  There's a file called "lexical test" that just contains one of each token type. 
+  Can run that through the scanner to make sure that everything is recognized by the regexes. 
+
+
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 Simple Expressions
