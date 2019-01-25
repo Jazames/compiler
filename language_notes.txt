@@ -66,6 +66,27 @@ Convert a RegEx into a FSM.
       3) Begin with the start state. For each transition, list the state that it goes to. 
         For cases where there are multiple transitions with the same lable or an empty transition, combine the states into a new super state thing.
       4) For each new state or super state added to the table, list the possible transitions out of it. 
-      4.5) Minimizing Can combine rows with identical [transition?] information.
+      4.5) Minimizing/Optimizing: Can combine identical columns. Can combine rows with identical transition information, creating a combined state. 
+        These optimizations don't decrease the number of steps, rather, they decrease the memory footprint of the machine. 
       5) When all states have had all of their transitions listed, the table now represents a finite state machine. 
-  
+
+
+=================
+=Parsing tokens:=
+=================
+
+Two ways to do parsing.
+  Left most derivation
+    Also called recursive descent. 
+      Consumes terminals
+      Makes function calls for non-terminals. 
+  Right most derivation
+
+
+
+
+
+
+
+
+
