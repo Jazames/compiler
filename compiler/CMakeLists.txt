@@ -20,8 +20,8 @@ set(calc_srcs
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}
 )
-source_group("Calc" FILES ${calc_srcs})
+source_group("CPSL" FILES ${cpsl_srcs})
 
-add_executable(calc ${calc_srcs})
-target_link_libraries(calc ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
-target_include_directories(calc PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+add_executable(cpsl ${cpsl_srcs})
+target_link_libraries(cpsl ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
+target_include_directories(cpsl PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

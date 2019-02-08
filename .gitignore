@@ -1,6 +1,9 @@
 
-*/build
-*/Build
-*/BUILD
+build/*
+Build/*
+BUILD/*
+*/build/*
+*/Build/*
+*/BUILD/*
 .o
 
