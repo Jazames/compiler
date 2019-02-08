@@ -97,4 +97,31 @@ Good idea to write functions that can compute distance between 2 points, sum and
 
 
 
+/////////////////
+
+
+
+How to organize output file:
+
+
+	.globl main
+	.text
+main: 	
+	assembly instrucitions
+
+
+
+.data
+	//string literals
+	STR1: .ascii2 "number is" 
+GA: //global area pointer
+	//This is just a bunch of area to put heap stuff. 
+
+
+
+
+
+
+
+
 
