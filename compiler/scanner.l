@@ -1,11 +1,15 @@
 %{
 #include <cstdlib>
 #include "parser.hpp"
+#include "symbol_table.hpp"
 
 extern "C" int yylex();
 %}
 
 %%
+
+
+[\t ]*      {/* ignore whitespace */}
 
 "array"     {return ARRAY_TOKEN;}
 "ARRAY"     {return ARRAY_TOKEN;}
@@ -83,7 +87,7 @@ extern "C" int yylex();
 "=" {return EQUAL_TOKEN;}
 "<>" {return NOT_EQUAL_TOKEN;}
 "<" {return LESS_THAN_TOKEN;}
-"<=" {return LESS_THAN_EQUAL_TOKEN}
+"<=" {return LESS_THAN_EQUAL_TOKEN;}
 ">" {return GREATER_THAN_TOKEN;}
 ">=" {return GREATER_THAN_EQUAL_TOKEN;}
 "." {return DOT_TOKEN;}
@@ -106,6 +110,10 @@ extern "C" int yylex();
 "\""[ -~]*"\"" {return STRING_LITERAL_TOKEN;}
 
 "\$" {return COMMENT_TOKEN;}
+
+"\n" {line_number++;}
+
+
 %%
 
 

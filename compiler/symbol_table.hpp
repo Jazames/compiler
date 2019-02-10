@@ -6,4 +6,7 @@
 #include <map>
 
 
+
+extern int line_number;
+
 #endif

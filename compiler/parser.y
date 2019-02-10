@@ -11,35 +11,284 @@ void yyerror(const char*);
 
 %union
 {
-float val;
+int val;  //Probably include char in here too? 
 char* id;
 }
 
-%token ADD
-%token SUB
-%token MULT
-%token DIV
-%token OPEN
-%token CLOSE
-%token DONE
-%token NUMBER
-%token ID
-%token EQUAL
-%token LET
+%token ARRAY_TOKEN
+%token BEGIN_TOKEN
+%token CHR_TOKEN
+%token CONST_TOKEN
+%token DO_TOKEN
+%token DOWNTO_TOKEN
+%token ELSE_TOKEN
+%token ELSEIF_TOKEN
+%token END_TOKEN
+%token FOR_TOKEN
+%token FORWARD_TOKEN
+%token FUNCTION_TOKEN
+%token IF_TOKEN
+%token OF_TOKEN
+%token ORD_TOKEN
+%token PRED_TOKEN
+%token PROCEDURE_TOKEN
+%token READ_TOKEN
+%token RECORD_TOKEN
+%token REF_TOKEN
+%token REPEAT_TOKEN
+%token RETURN_TOKEN
+%token STOP_TOKEN
+%token SUCC_TOKEN
+%token THEN_TOKEN
+%token TO_TOKEN
+%token TYPE_TOKEN
+%token UNTIL_TOKEN
+%token VAR_TOKEN
+%token WHILE_TOKEN
+%token WRITE_TOKEN
+%token IDENTIFIER_TOKEN
+%token ADD_TOKEN
+%token SUB_TOKEN
+%token MULT_TOKEN
+%token DIV_TOKEN
+%token AND_TOKEN
+%token OR_TOKEN
+%token NOT_TOKEN
+%token EQUAL_TOKEN
+%token NOT_EQUAL_TOKEN
+%token LESS_THAN_TOKEN
+%token LESS_THAN_EQUAL_TOKEN
+%token GREATER_THAN_TOKEN
+%token GREATER_THAN_EQUAL_TOKEN
+%token DOT_TOKEN
+%token COMMA_TOKEN
+%token COLON_TOKEN
+%token SEMICOLON_TOKEN
+%token OPEN_PAREN_TOKEN
+%token CLOSE_PAREN_TOKEN
+%token OPEN_BRACKET_TOKEN
+%token CLOSE_BRACKET_TOKEN
+%token ASSIGNMENT_TOKEN
+%token MOD_TOKEN
+%token OCTAL_LITERAL_TOKEN
+%token HEX_LITERAL_TOKEN
+%token DECIMAL_LITERAL_TOKEN;
+%token CHAR_LITERAL_TOKEN
+%token STRING_LITERAL_TOKEN
+%token COMMENT_TOKEN
 
-%type <val> NUMBER
-%type <val> Expression
-%type <val> Factor
-%type <val> Term
-%type <id> ID
+
+ //%right SUB_TOKEN
+%left MULT_TOKEN DIV_TOKEN MOD_TOKEN 
+%left ADD_TOKEN SUB_TOKEN
+%nonassoc EQUAL_TOKEN NOT_EQUAL_TOKEN LESS_THAN_TOKEN LESS_THAN_EQUAL_TOKEN GREATER_THAN_TOKEN GREATER_THAN_EQUAL_TOKEN
+%right NOT_TOKEN
+%left AND_TOKEN
+%left OR_TOKEN
+
+
 
 %%
+
+Program : ConstantDeclSection TypeDeclSection VarDeclSection ProFuncDeclSection Block {} DOT_TOKEN
+        ;
+
+ConstantDeclSection : CONST_TOKEN ConstantDeclList {}
+                    | {}
+                    ;
+ConstantDeclList : ConstantDeclList ConstantDecl {}
+                 | {}
+                 ;
+ConstantDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Expression SEMICOLON_TOKEN {}
+             ;
+
+TypeDeclSection : TYPE_TOKEN TypeDeclList
+                | {}
+                ;
+TypeDeclList : TypeDeclList TypeDecl {}
+             | {}
+             ;
+TypeDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Type SEMICOLON_TOKEN {}
+         ;
+Type : SimpleType {}
+     | RecordType {}
+     | ArrayType {}
+     ;
+SimpleType : IDENTIFIER_TOKEN {}
+           ;
+RecordType : RECORD_TOKEN RecordList END_TOKEN {}
+RecordList : RecordList RecordLine {}
+           | {} {}
+           ;
+RecordLine : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {}
+           ;
+ArrayType : ARRAY_TOKEN OPEN_BRACKET_TOKEN Expression COLON_TOKEN Expression CLOSE_BRACKET_TOKEN OF_TOKEN Type {}
+          ;
+IdentList : IDENTIFIER_TOKEN  {}
+          | IDENTIFIER_TOKEN COMMENT_TOKEN IdentList {}
+          ;
+
+VarDeclSection : VAR_TOKEN VarDeclList {}
+               | {}
+               ;
+VarDeclList : VarDeclList VarDecl {}
+            | {}
+            ;
+VarDecl : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {}
+        ;
+
+ProFuncDeclSection : ProFuncDeclList {}
+                   ;
+ProFuncDeclList : ProFuncDeclList ProcedureDecl {}
+                | ProFuncDeclList FunctionDecl {}
+                | {}
+                ;
+ProcedureDecl : PROCEDURE_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
+              | PROCEDURE_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {}
+              ;
+FunctionDecl : FUNCTION_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
+             | FUNCTION_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {}
+             ;
+FormalParameters : ParameterList {}
+                 | {} 
+                 ;
+ParameterList : ParameterLine {}
+              | ParameterLine SEMICOLON_TOKEN ParameterList {}
+              ;
+ParameterLine : VarOrRef IdentList COLON_TOKEN Type {}
+              ;
+VarOrRef : VAR_TOKEN {}
+         | REF_TOKEN {}
+         | {}
+         ;
+Body : ConstantDeclSection TypeDeclSection VarDeclSection Block {}
+     ;
+Block : BEGIN_TOKEN StatementSequence END_TOKEN {}
+      ;
+
+StatementSequence : Statement {}
+                  | Statement SEMICOLON_TOKEN StatementSequence {}
+                  ;
+
+Statement : Assignment {}
+          | IfStatement {}
+          | WhileStatement {}
+          | RepeatStatement {}
+          | ForStatement {}
+          | StopStatement {}
+          | ReturnStatement {}
+          | ReadStatement {}
+          | WriteStatement {}
+          | ProcedureCall {}
+          | NullStatement {}
+          ;
+Assignment : LValue ASSIGNMENT_TOKEN Expression {}
+           ;
+IfStatement : IF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence ElseSequence END_TOKEN {}
+            ;
+ElseIfSequence : ELSEIF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence {}
+               | {}
+               ;
+ElseSequence : ELSE_TOKEN StatementSequence {}
+             | {}
+             ;
+WhileStatement : WHILE_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {}
+               ;
+RepeatStatement : REPEAT_TOKEN StatementSequence UNTIL_TOKEN Expression {}
+                ;
+ForStatement : FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression TO_TOKEN     Expression DO_TOKEN StatementSequence END_TOKEN {}
+             | FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression DOWNTO_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {}
+             ;
+StopStatement : STOP_TOKEN {}
+              ;
+ReturnStatement : RETURN_TOKEN Expression {}
+                | RETURN_TOKEN {}
+                ;
+ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {}
+              ;
+LValueList : LValue {}
+           | LValue COMMA_TOKEN LValueList {}
+           ;
+WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
+               ;
+ExpressionList : Expression {}
+               | Expression COMMA_TOKEN ExpressionList {}
+               ;
+ProcedureCall : IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
+              | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
+              ;
+NullStatement : {}
+              ;
+
+Expression : Expression OR_TOKEN Expression {}
+           | Expression AND_TOKEN Expression {}
+           | Expression EQUAL_TOKEN Expression {}
+           | Expression NOT_EQUAL_TOKEN Expression {}
+           | Expression LESS_THAN_EQUAL_TOKEN Expression {}
+           | Expression GREATER_THAN_EQUAL_TOKEN Expression {}
+           | Expression LESS_THAN_TOKEN Expression {}
+           | Expression GREATER_THAN_TOKEN Expression {}
+           | Expression ADD_TOKEN Expression {}
+           | Expression SUB_TOKEN Expression {}
+           | Expression MULT_TOKEN Expression {}
+           | Expression DIV_TOKEN Expression {}
+           | Expression MOD_TOKEN Expression {}
+           | NOT_TOKEN Expression {}
+           | SUB_TOKEN Expression {}
+           | OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN  {}
+           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
+           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
+           | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | LValue {}
+           | Number {}
+           ;
+
+LValue : IDENTIFIER_TOKEN AccessChain {}
+       ;
+AccessChain : DOT_TOKEN IDENTIFIER_TOKEN AccessChain {}
+            | OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN AccessChain {}
+            | {}
+            ;
+
+Number : CHAR_LITERAL_TOKEN {}
+       | HEX_LITERAL_TOKEN {}
+       | OCTAL_LITERAL_TOKEN {}
+       | DECIMAL_LITERAL_TOKEN {}
+       | STRING_LITERAL_TOKEN { } //This one may be very wrong. 
+       ;
+
+%%
+
+void yyerror(const char* msg)
+{
+  std::cerr << msg << " at line number " << line_number << std::endl;
+}
+
+
+
+
+/*
+
+
+
+
+
+
+
+
+
+
+
 
 StatementList : StatementList Statement{}
               | {};
 Statement : Expression DONE {std::cout << $1 << std::endl;}
           | LET ID EQUAL Expression DONE{symbol_table.store($2,$4);delete($2);}
-          | DONE{};
+          | DONE{}
+          ;
 Expression : Expression ADD Term {$$ = $1 + $3;}
            | Expression SUB Term {$$ = $1 - $3;}
            | Term {$$ = $1;};
@@ -51,13 +300,111 @@ Term : Term MULT Factor { $$ = $1 * $3;}
      ;
 Factor : OPEN Expression CLOSE {$$ = $2;}
        | NUMBER {$$ = $1;}
-       | ID {$$ = symbol_table.lookup($1);delete($1);}
+       | ID {/$$ = 0symbol_table.lookup($1);delete($1);}
        ;
 
-%%
 
-void yyerror(const char* msg)
-{
-  std::cerr << msg << std::endl;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Expression : Expression OR_TOKEN Possibility {}
+           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
+           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
+           | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | LValue  {}
+           | Possibility {}
+           ; 
+Possibility : Possibility AND_TOKEN Condition {}
+            | Condition {}
+            ; 
+Condition : NOT_TOKEN Boolean {}
+          | Boolean {}
+          ; 
+Boolean: Relation EQUAL_TOKEN Relation {}
+       | Relation NOT_EQUAL_TOKEN Relation {}
+       | Relation LESS_THAN_TOKEN Relation {}
+       | Relation LESS_THAN_EQUAL_TOKEN Relation {}
+       | Relation GREATER_THAN_TOKEN Relation {}
+       | Relation GREATER_THAN_EQUAL_TOKEN Relation {}
+       | Relation {}
+       ; 
+Relation : Relation ADD_TOKEN Term {}
+         | Relation SUB_TOKEN Term {}
+         | Term {}
+         ; 
+Term : Term MULT_TOKEN Factor {}
+     | Term DIV_TOKEN Factor {}
+     | Term MOD_TOKEN Factor {}
+     | Factor {}
+     ; 
+Factor : SUB_TOKEN Number {}
+       | Number {}
+       ; 
+Number : OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+       | IDENTIFIER_TOKEN {}
+       | CHAR_LITERAL_TOKEN {}
+       | HEX_LITERAL_TOKEN {}
+       | OCTAL_LITERAL_TOKEN {}
+       | DECIMAL_LITERAL_TOKEN {}
+       | STRING_LITERAL_TOKEN { } //This one may be very wrong. 
+       ;
+
+
+
+
+
+
+Expression : Expression ADD_TOKEN Term {}
+           | Expression SUB_TOKEN Term {}
+           | Term {}
+           | LValue {}
+           ;
+
+Term : Term MULT_TOKEN Factor {}
+     | Term DIV_TOKEN Factor {}
+     | Term MOD_TOKEN Factor {}
+     | Factor {}
+     ;
+Factor : OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+       | Number {}
+       | IDENTIFIER_TOKEN {}
+       ;
+Number : CHAR_LITERAL_TOKEN
+       | OCTAL_LITERAL_TOKEN
+       | HEX_LITERAL_TOKEN
+       | DECIMAL_LITERAL_TOKEN
+       ;
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
 
