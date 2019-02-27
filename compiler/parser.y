@@ -246,12 +246,13 @@ Expression : Expression OR_TOKEN Expression {}
            | Number {}
            ;
 
-LValue : IDENTIFIER_TOKEN AccessChain {}
+
+
+LValue : IDENTIFIER_TOKEN {}
+       | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {}
+       | LValue DOT_TOKEN IDENTIFIER_TOKEN {}
        ;
-AccessChain : DOT_TOKEN IDENTIFIER_TOKEN AccessChain {}
-            | OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN AccessChain {}
-            | {}
-            ;
+
 
 Number : CHAR_LITERAL_TOKEN {}
        | HEX_LITERAL_TOKEN {}

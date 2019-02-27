@@ -87,15 +87,26 @@ Testing the Scanner:
   There's a file called "lexical test" that just contains one of each token type. 
   Can run that through the scanner to make sure that everything is recognized by the regexes. 
 
-
-
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 Simple Expressions
 ---------------------------
+
+Common Sub-expression Elimination - The process of simplifying the register allocation of expressions when expressions have repeat steps. 
+  For example, the expression b := a * a doesn't require a to be assigned each time, it only needs to be assigned once. 
+  Another example, the expression c := (a - b) * (a - b) doesn't need to compute a - b twice, it just needs to do it once, then multiply by itself. 
+
+Constant folding: when expressions contain constants and produces a constant, the expression can be simplified into a constant. 
+  For example, a := 3 * 3 / 9 can be simplified into 1, thus, the code should effectively run a := 1.  
+  Constant Folding is the only opitimization we need to put into our compiler. 
+
+
+
+
+
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 User Defined Data Types
