@@ -3,6 +3,10 @@
 
 #include<vector>
 
+
+
+using Value = int;
+
 class Expression
 {
 private:
@@ -10,8 +14,8 @@ private:
 public:
 	Expression() = default;
 	virtual ~Expression() = default;
-	virtual void emit() = 0;
-	virtual isConst() {return false;}
+	virtual Value emit() = 0;
+	virtual bool isConst() {return false;}
 };
 
 class Identifier {
@@ -28,16 +32,220 @@ private:
 public:
 	LValue() = default;
 	virtual ~LValue() = default;
-	virtual void emit() = 0;
+	virtual Value emit() = 0;
+	virtual bool isConst() {return false;}
 };
+
+
+
+
+
+
+class OrExpr : public Expression
+{
+public:
+	OrExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit(); 
+	bool isConst() {return l->isConst() && r->isConst();}
+private:
+	Expression* l, r;
+}; 
+
+class AndExpr : public Expression
+{
+public:
+	AndExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit(); 
+	bool isConst() {return l->isConst() && r->isConst();}
+private:
+	Expression* l, r;
+};
+
+class EqualToExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+}; 
+
+class NotEqualToExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class LessThanEqualToExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class GreaterThanEqualToExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class LessThanExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class GreaterThanExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class AddExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class SubExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class MultExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class DivExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class ModExpr : public Expression
+{
+public:
+	
+private:
+	Expression* l, r;
+};
+
+class NotExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class NegationExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class ParenthesisExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class FunctionCallExpr : public Expression
+{
+public:
+	
+private:
+	
+};
+
+class ChrExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class OrdExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class PredExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class SuccExpr : public Expression
+{
+public:
+	
+private:
+	Expression* e;
+};
+
+class LValueExpr : public Expression
+{
+public:
+	
+private:
+	LValue* lval;
+};
+
+class LiteralExpr : public Expression
+{
+public:
+	LiteralExpr(int val) : Expression(), val(val) {}
+	Value emit(); 
+	bool isConst() {return true;}
+private:
+	int val;
+};
+
+
+
+
+
 
 class IdentLValue : public LValue
 {
 public:
-	IdentLValue(Identifier* id, Expression* ex) : LValue(), ident(id), expr(ex) {} 
+	IdentLValue(Identifier* id) : LValue(), ident(id) {} 
+	Value Emit();
+	bool isConst() {return false;}
 private:
 	Identifier* ident;
 	Expression* expr;
+	bool const;
 };
 
 class ArrayLValue : public LValue

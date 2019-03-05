@@ -7,7 +7,7 @@
 templat<typename ExprT, typename F>
 Expr* make(Expr*l,Expr*r,F f)
 {
-	if(l->isConst() && r->())
+	if(l->isConst() && r->isConst())
 	{
 		//if they are constant, then create a new literal value with the 
 		//  value of the two literals and the function acting on them.
