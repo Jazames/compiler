@@ -11,7 +11,7 @@ void yyerror(const char*);
 
 %union
 {
-int val;  //Probably include char in here too? 
+int val;  
 char* id;
 }
 

@@ -7,6 +7,11 @@
 
 
 
+class SymbolTable
+{
+	
+}
+
 extern int line_number;
 
 #endif

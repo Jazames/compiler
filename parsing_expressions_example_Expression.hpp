@@ -90,7 +90,7 @@ public:
 class Variable : public Expr
 {
 public: 
-	Var(std::string name): Expr(),name(name){}
+	Variable(std::string name): Expr(), name(name){}
 	const std::string name;
 	Value emit() override;
 }

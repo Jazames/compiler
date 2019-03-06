@@ -45,8 +45,8 @@ class OrExpr : public Expression
 {
 public:
 	OrExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
-	Value emit(); 
-	bool isConst() {return l->isConst() && r->isConst();}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 }; 
@@ -55,8 +55,8 @@ class AndExpr : public Expression
 {
 public:
 	AndExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
-	Value emit(); 
-	bool isConst() {return l->isConst() && r->isConst();}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -64,7 +64,9 @@ private:
 class EqualToExpr : public Expression
 {
 public:
-	
+	EqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 }; 
@@ -72,7 +74,9 @@ private:
 class NotEqualToExpr : public Expression
 {
 public:
-	
+	NotEqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -80,7 +84,9 @@ private:
 class LessThanEqualToExpr : public Expression
 {
 public:
-	
+	LessThanEqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -88,7 +94,9 @@ private:
 class GreaterThanEqualToExpr : public Expression
 {
 public:
-	
+	GreaterThanEqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -96,7 +104,9 @@ private:
 class LessThanExpr : public Expression
 {
 public:
-	
+	LessThanExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -104,7 +114,9 @@ private:
 class GreaterThanExpr : public Expression
 {
 public:
-	
+	GreaterThanExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -112,7 +124,9 @@ private:
 class AddExpr : public Expression
 {
 public:
-	
+	AddExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -120,7 +134,9 @@ private:
 class SubExpr : public Expression
 {
 public:
-	
+	SubExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -128,7 +144,9 @@ private:
 class MultExpr : public Expression
 {
 public:
-	
+	MultExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -136,7 +154,9 @@ private:
 class DivExpr : public Expression
 {
 public:
-	
+	DivExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -144,7 +164,9 @@ private:
 class ModExpr : public Expression
 {
 public:
-	
+	ModExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) {}
+	Value emit() override; 
+	bool isConst() override {return l->isConst() && r->isConst();}
 private:
 	Expression* l, r;
 };
@@ -152,7 +174,9 @@ private:
 class NotExpr : public Expression
 {
 public:
-	
+	NotExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -160,7 +184,9 @@ private:
 class NegationExpr : public Expression
 {
 public:
-	
+	NegationExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -168,7 +194,9 @@ private:
 class ParenthesisExpr : public Expression
 {
 public:
-	
+	ParenthesisExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -184,7 +212,9 @@ private:
 class ChrExpr : public Expression
 {
 public:
-	
+	ChrExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -192,7 +222,9 @@ private:
 class OrdExpr : public Expression
 {
 public:
-	
+	OrdExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -200,7 +232,9 @@ private:
 class PredExpr : public Expression
 {
 public:
-	
+	PredExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -208,7 +242,9 @@ private:
 class SuccExpr : public Expression
 {
 public:
-	
+	SuccExpr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	Expression* e;
 };
@@ -216,7 +252,9 @@ private:
 class LValueExpr : public Expression
 {
 public:
-	
+	Expr(Expression* e) : Expression(), e(e){}
+	Value emit() override; 
+	bool isConst() override {return e->isConst();}
 private:
 	LValue* lval;
 };
@@ -224,11 +262,11 @@ private:
 class LiteralExpr : public Expression
 {
 public:
-	LiteralExpr(int val) : Expression(), val(val) {}
-	Value emit(); 
-	bool isConst() {return true;}
+	LiteralExpr(Value val) : Expression(), val(val) {}
+	Value emit() override; 
+	bool isConst() override {return true;}
 private:
-	int val;
+	const Value val;
 };
 
 
