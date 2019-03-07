@@ -9,9 +9,12 @@
 
 class SymbolTable
 {
-	
+public:
+	static void incrementLineNumber() {line_number++;}
+	static int getLineNumber() {return line_number;}
+private:
+	static int line_number;
 }
 
-extern int line_number;
 
 #endif

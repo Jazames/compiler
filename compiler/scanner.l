@@ -111,7 +111,7 @@ extern "C" int yylex();
 
 "\$" {return COMMENT_TOKEN;}
 
-"\n" {line_number++;}
+"\n" {SymbolTable::incrementLineNumber();}
 
 
 %%

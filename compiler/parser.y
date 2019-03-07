@@ -3,6 +3,7 @@
 #include <map>
 
 #include "symbol_table.hpp"
+#include "tree.hpp"
 
 extern "C" int yylex(void);
 
@@ -13,6 +14,7 @@ void yyerror(const char*);
 {
 int val;  
 char* id;
+Expression* expr;
 }
 
 %token ARRAY_TOKEN
@@ -77,6 +79,12 @@ char* id;
 %token STRING_LITERAL_TOKEN
 %token COMMENT_TOKEN
 
+//TODO: This is broken and needs designing and this comment needs to be deleted. 
+%type <val> NUMBER
+%type <expr> Expression
+%type <expr> Factor
+%type <expr> Term
+%type <id> ID
 
  //%right SUB_TOKEN
 %left MULT_TOKEN DIV_TOKEN MOD_TOKEN 
@@ -86,8 +94,7 @@ char* id;
 %left AND_TOKEN
 %left OR_TOKEN
 
-
-
+ 
 %%
 
 Program : ConstantDeclSection TypeDeclSection VarDeclSection ProFuncDeclSection Block {} DOT_TOKEN
@@ -265,24 +272,13 @@ Number : CHAR_LITERAL_TOKEN {}
 
 void yyerror(const char* msg)
 {
-  std::cerr << msg << " at line number " << line_number << std::endl;
+  std::cerr << msg << " at line number " << SymbolTable::getLineNumber() << std::endl;
 }
 
 
 
 
 /*
-
-
-
-
-
-
-
-
-
-
-
 
 StatementList : StatementList Statement{}
               | {};

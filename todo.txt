@@ -19,8 +19,8 @@ To read this file in chronological order, start at the bottom and read up.
 ---------------------------------------------
 Checkpoint 2: Simple expressions
 
-Build Minimum Tree Structure for Expressions
-Build Register Pool Management
+-Build Minimum Tree Structure for Expressions
+-Build Register Pool Management
 Build Symbol Table
 Add code to bison file to fill in tree structure
 	Modify tree structure as necessary

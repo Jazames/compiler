@@ -55,7 +55,7 @@ j, jr, jal
   jump and link - 
 
 Reserved
-$zero - Always 0 isn't a real register, but it's a ground wire. Always reads 0. 
+$zero - Always 0 isn't a real register, it's just a ground wire. Always reads 0. 
 $at - Assembler Temporary. DO NOT TOUCH THIS
 $k0, $k1 - They are for the kernel. DO NOT TOUCH THEM EITHER.
 
