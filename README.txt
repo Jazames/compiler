@@ -2,7 +2,24 @@
 
 This is a compiler for CS5300
 
-Checkpoints will be tagged via git
+
+
+To test, this bash script works: 
+
+for i in *.cpsl
+do 
+  echo $i;
+  ./cpsl < $i > $i.asm
+  java -jar Mars 4.5.jar $i.asm
+done
+
+Assuming that the directory you're in contains the test files. 
+Perhaps also set up directories. 
+
+The test on the github was set up by a student. 
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 Notes for checkpoints:
