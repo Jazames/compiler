@@ -34,15 +34,15 @@ Checkpoint 1: parser and scanner:
 
 List of things to do to make it work:
 
-Create regular expressions for keywords
-Create regular expressions for operators
-Create regular expressions for identifiers
-Create regular expressions for everything else
+-Create regular expressions for keywords
+-Create regular expressions for operators
+-Create regular expressions for identifiers
+-Create regular expressions for everything else
 
-Create context free grammar rules for language rules.
+-Create context free grammar rules for language rules.
   There's a lot to this one, but I don't know what.
 
-Create symbol table? 
+-Create symbol table? 
 
 ---------------------------------------------
 Day 3: 

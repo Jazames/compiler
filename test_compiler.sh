@@ -20,8 +20,8 @@ do
   name="${name%%.cpsl}";
   #echo $name;
   echo "Testing $name";
-  ./build/cpsl < $i > $DIRECTORY/$name.asm
-#  java -jar Mars4_5.jar $DIRECTORY/$name.asm
+  ./build/cpsl < $i  > $DIRECTORY/$name.asm
+  java -jar Mars4_5.jar $DIRECTORY/$name.asm
   echo "";
   echo "";
 done

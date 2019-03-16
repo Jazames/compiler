@@ -112,9 +112,11 @@ extern "C" int yylex();
 "0"[xX][0-9]+ {return HEX_LITERAL_TOKEN;}
 [0-9]+ {if(DEBUG) std::cout << "found decimal_literal_token" << std::endl;return DECIMAL_LITERAL_TOKEN;} 
 
-"\'"[ -~]"\'" {return CHAR_LITERAL_TOKEN;}
+"\'"[ -~]"\'" {if(DEBUG) std::cout << "found char_literal_token" << std::endl;return CHAR_LITERAL_TOKEN;}
 
-"\""[ -~]*"\"" {return STRING_LITERAL_TOKEN;}
+"\'"[ -~][nrbtf]"\'" {if(DEBUG) std::cout << "found char_literal_token" << std::endl;return CHAR_LITERAL_TOKEN;}
+
+"\""[ -~]*"\"" {if(DEBUG) std::cout << "found string_literal_token" << std::endl;return STRING_LITERAL_TOKEN;}
 
 "\$"[ -~]*"\n" {SymbolTable::getInstance().incrementLineNumber(); /*return COMMENT_TOKEN;*/}
 

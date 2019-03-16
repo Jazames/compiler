@@ -260,11 +260,11 @@ LValue : IDENTIFIER_TOKEN {}
 
 
 Literal : CHAR_LITERAL_TOKEN {}
-       | HEX_LITERAL_TOKEN {}
-       | OCTAL_LITERAL_TOKEN {}
-       | DECIMAL_LITERAL_TOKEN {}
-       | STRING_LITERAL_TOKEN { /*This might be very wrong.*/} 
-       ;
+        | HEX_LITERAL_TOKEN {}
+        | OCTAL_LITERAL_TOKEN {}
+        | DECIMAL_LITERAL_TOKEN {}
+        | STRING_LITERAL_TOKEN { /*This might be very wrong.*/} 
+        ;
 
 %%
 
