@@ -1,5 +1,5 @@
-#ifndef
-#define
+#ifndef TREE_HPP
+#define TREE_HPP
 
 #include<vector>
 
@@ -23,7 +23,7 @@ public:
 
 private:
 
-}
+};
 
 class LValue
 {
@@ -48,7 +48,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 }; 
 
 class AndExpr : public Expression
@@ -58,7 +58,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class EqualToExpr : public Expression
@@ -68,7 +68,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 }; 
 
 class NotEqualToExpr : public Expression
@@ -78,7 +78,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class LessThanEqualToExpr : public Expression
@@ -88,7 +88,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class GreaterThanEqualToExpr : public Expression
@@ -98,7 +98,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class LessThanExpr : public Expression
@@ -108,7 +108,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class GreaterThanExpr : public Expression
@@ -118,7 +118,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class AddExpr : public Expression
@@ -128,7 +128,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class SubExpr : public Expression
@@ -138,7 +138,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class MultExpr : public Expression
@@ -148,7 +148,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class DivExpr : public Expression
@@ -158,7 +158,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class ModExpr : public Expression
@@ -168,7 +168,7 @@ public:
 	Value emit() override; 
 	bool isConst() override {return l->isConst() && r->isConst();}
 private:
-	Expression* l, r;
+	Expression* l, *r;
 };
 
 class NotExpr : public Expression
@@ -252,9 +252,9 @@ private:
 class LValueExpr : public Expression
 {
 public:
-	Expr(Expression* e) : Expression(), e(e){}
+	LValueExpr() : Expression() {}
 	Value emit() override; 
-	bool isConst() override {return e->isConst();}
+	bool isConst() override {return lval->isConst();}
 private:
 	LValue* lval;
 };
@@ -277,13 +277,13 @@ private:
 class IdentLValue : public LValue
 {
 public:
-	IdentLValue(Identifier* id) : LValue(), ident(id) {} 
+	IdentLValue(Identifier* id, bool isDeclConst) : LValue(), ident(id), isDeclConst(isDeclConst) {} 
 	Value Emit();
-	bool isConst() {return false;}
+	bool isConst() override {return isDeclConst;}
 private:
 	Identifier* ident;
 	Expression* expr;
-	bool const;
+	const bool isDeclConst;
 };
 
 class ArrayLValue : public LValue
@@ -314,13 +314,13 @@ public:
  
 class Assignment : public Statement
 {
+public:
+	Assignment(LValue* l, Expression* e) : Statement(), lval(l), e(e) {}
+	void emit() override;
 private:
 	LValue* lval;
-	Expression* expr;
+	Expression* e;
 
-public:
-	Assignment(Lvalue* l, Expression* e) : Statement(), lval(l), expr(e) {}
-	void emit() override;
 };
 
 class Read : public Statement

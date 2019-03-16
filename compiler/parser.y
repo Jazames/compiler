@@ -79,12 +79,10 @@ Expression* expr;
 %token STRING_LITERAL_TOKEN
 %token COMMENT_TOKEN
 
-//TODO: This is broken and needs designing and this comment needs to be deleted. 
-%type <val> NUMBER
+ //TODO: This is broken and needs designing and this comment needs to be deleted. 
+%type <val> Literal
 %type <expr> Expression
-%type <expr> Factor
-%type <expr> Term
-%type <id> ID
+%type <id> IDENTIFIER_TOKEN
 
  //%right SUB_TOKEN
 %left MULT_TOKEN DIV_TOKEN MOD_TOKEN 
@@ -250,7 +248,7 @@ Expression : Expression OR_TOKEN Expression {}
            | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | LValue {}
-           | Number {}
+           | Literal {}
            ;
 
 
@@ -261,137 +259,24 @@ LValue : IDENTIFIER_TOKEN {}
        ;
 
 
-Number : CHAR_LITERAL_TOKEN {}
+Literal : CHAR_LITERAL_TOKEN {}
        | HEX_LITERAL_TOKEN {}
        | OCTAL_LITERAL_TOKEN {}
        | DECIMAL_LITERAL_TOKEN {}
-       | STRING_LITERAL_TOKEN { } //This one may be very wrong. 
+       | STRING_LITERAL_TOKEN { /*This might be very wrong.*/} 
        ;
 
 %%
 
 void yyerror(const char* msg)
 {
-  std::cerr << msg << " at line number " << SymbolTable::getLineNumber() << std::endl;
+  std::cerr << msg << " at line number " << SymbolTable::getInstance().getLineNumber() << std::endl;
 }
 
 
 
 
-/*
 
-StatementList : StatementList Statement{}
-              | {};
-Statement : Expression DONE {std::cout << $1 << std::endl;}
-          | LET ID EQUAL Expression DONE{symbol_table.store($2,$4);delete($2);}
-          | DONE{}
-          ;
-Expression : Expression ADD Term {$$ = $1 + $3;}
-           | Expression SUB Term {$$ = $1 - $3;}
-           | Term {$$ = $1;};
-
-Term : Term MULT Factor { $$ = $1 * $3;}
-     | Term Factor { $$ = $1 * $2;}
-     | Term DIV Factor { $$ = $1 / $3;}
-     | Factor {$$ = $1;}
-     ;
-Factor : OPEN Expression CLOSE {$$ = $2;}
-       | NUMBER {$$ = $1;}
-       | ID {/$$ = 0symbol_table.lookup($1);delete($1);}
-       ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Expression : Expression OR_TOKEN Possibility {}
-           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
-           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
-           | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | LValue  {}
-           | Possibility {}
-           ; 
-Possibility : Possibility AND_TOKEN Condition {}
-            | Condition {}
-            ; 
-Condition : NOT_TOKEN Boolean {}
-          | Boolean {}
-          ; 
-Boolean: Relation EQUAL_TOKEN Relation {}
-       | Relation NOT_EQUAL_TOKEN Relation {}
-       | Relation LESS_THAN_TOKEN Relation {}
-       | Relation LESS_THAN_EQUAL_TOKEN Relation {}
-       | Relation GREATER_THAN_TOKEN Relation {}
-       | Relation GREATER_THAN_EQUAL_TOKEN Relation {}
-       | Relation {}
-       ; 
-Relation : Relation ADD_TOKEN Term {}
-         | Relation SUB_TOKEN Term {}
-         | Term {}
-         ; 
-Term : Term MULT_TOKEN Factor {}
-     | Term DIV_TOKEN Factor {}
-     | Term MOD_TOKEN Factor {}
-     | Factor {}
-     ; 
-Factor : SUB_TOKEN Number {}
-       | Number {}
-       ; 
-Number : OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-       | IDENTIFIER_TOKEN {}
-       | CHAR_LITERAL_TOKEN {}
-       | HEX_LITERAL_TOKEN {}
-       | OCTAL_LITERAL_TOKEN {}
-       | DECIMAL_LITERAL_TOKEN {}
-       | STRING_LITERAL_TOKEN { } //This one may be very wrong. 
-       ;
-
-
-
-
-
-
-Expression : Expression ADD_TOKEN Term {}
-           | Expression SUB_TOKEN Term {}
-           | Term {}
-           | LValue {}
-           ;
-
-Term : Term MULT_TOKEN Factor {}
-     | Term DIV_TOKEN Factor {}
-     | Term MOD_TOKEN Factor {}
-     | Factor {}
-     ;
-Factor : OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-       | Number {}
-       | IDENTIFIER_TOKEN {}
-       ;
-Number : CHAR_LITERAL_TOKEN
-       | OCTAL_LITERAL_TOKEN
-       | HEX_LITERAL_TOKEN
-       | DECIMAL_LITERAL_TOKEN
-       ;
-
-
-
-
-*/
 
 
 

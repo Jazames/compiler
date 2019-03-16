@@ -1,7 +1,10 @@
 %{
 #include <cstdlib>
-#include "parser.hpp"
+#include "tree.hpp"
 #include "symbol_table.hpp"
+
+//This needs to be included last
+#include "parser.hpp"
 
 extern "C" int yylex();
 %}
@@ -111,7 +114,7 @@ extern "C" int yylex();
 
 "\$" {return COMMENT_TOKEN;}
 
-"\n" {SymbolTable::incrementLineNumber();}
+"\n" {SymbolTable::getInstance().incrementLineNumber();}
 
 
 %%
