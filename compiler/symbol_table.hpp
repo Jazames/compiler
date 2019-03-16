@@ -28,7 +28,8 @@ private:
 	int line_number;
   std::vector<TypeSymbol> type_symbol_table;
   std::vector<VariableSymbol> variable_symbol_table;
-
+  SymbolTable() : line_number(1) {}
+  ~SymbolTable() {}
 
 };
 

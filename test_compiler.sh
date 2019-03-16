@@ -18,10 +18,10 @@ for i in TestFiles/*.cpsl
 do
   name="${i#*TestFiles/}";
   name="${name%%.cpsl}";
-  echo $name;
+  #echo $name;
   echo "Testing $name";
   ./build/cpsl < $i > $DIRECTORY/$name.asm
-  java -jar Mars4_5.jar $DIRECTORY/$name.asm
+#  java -jar Mars4_5.jar $DIRECTORY/$name.asm
   echo "";
   echo "";
 done

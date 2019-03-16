@@ -1,12 +1,16 @@
 %{
 #include <cstdlib>
+#include <iostream>
 #include "tree.hpp"
 #include "symbol_table.hpp"
 
 //This needs to be included last
 #include "parser.hpp"
 
+#define DEBUG false
+
 extern "C" int yylex();
+
 %}
 
 %%
@@ -38,8 +42,8 @@ extern "C" int yylex();
 "FORWARD"   {return FORWARD_TOKEN;}
 "function"  {return FUNCTION_TOKEN;}
 "FUNCTION"  {return FUNCTION_TOKEN;}
-"if"        {return IF_TOKEN;}
-"IF"        {return IF_TOKEN;}
+"if"        {if(DEBUG) std::cout << "found if_token" << std::endl;return IF_TOKEN;}
+"IF"        {if(DEBUG) std::cout << "found if_token" << std::endl;return IF_TOKEN;}
 "of"        {return OF_TOKEN;}
 "OF"        {return OF_TOKEN;}
 "ord"       {return ORD_TOKEN;}
@@ -62,8 +66,8 @@ extern "C" int yylex();
 "STOP"      {return STOP_TOKEN;}
 "succ"      {return SUCC_TOKEN;}
 "SUCC"      {return SUCC_TOKEN;}
-"then"      {return THEN_TOKEN;}
-"THEN"      {return THEN_TOKEN;}
+"then"      {if(DEBUG) std::cout << "found then_token" << std::endl;return THEN_TOKEN;}
+"THEN"      {if(DEBUG) std::cout << "found then_token" << std::endl;return THEN_TOKEN;}
 "to"        {return TO_TOKEN;}
 "TO"        {return TO_TOKEN;}
 "type"      {return TYPE_TOKEN;}
@@ -77,7 +81,7 @@ extern "C" int yylex();
 "write"     {return WRITE_TOKEN;}
 "WRITE"     {return WRITE_TOKEN;}
 
-[a-zA-Z][a-zA-Z0-9_]* {yylval.id = strdup(yytext);return IDENTIFIER_TOKEN;}
+[a-zA-Z][a-zA-Z0-9_]* {if(DEBUG) std::cout << "found id_token" << std::endl;yylval.id = strdup(yytext);return IDENTIFIER_TOKEN;}
 
 
 "+" {return ADD_TOKEN;}
@@ -85,13 +89,13 @@ extern "C" int yylex();
 "*" {return MULT_TOKEN;}
 "/" {return DIV_TOKEN;}
 "&" {return AND_TOKEN;}
-"|" {return OR_TOKEN;}
+"|" {if(DEBUG) std::cout << "found or_token" << std::endl;return OR_TOKEN;}
 "~" {return NOT_TOKEN;}
 "=" {return EQUAL_TOKEN;}
 "<>" {return NOT_EQUAL_TOKEN;}
-"<" {return LESS_THAN_TOKEN;}
+"<" {if(DEBUG) std::cout << "found less_than_token" << std::endl;return LESS_THAN_TOKEN;}
 "<=" {return LESS_THAN_EQUAL_TOKEN;}
-">" {return GREATER_THAN_TOKEN;}
+">" {if(DEBUG) std::cout << "found greater_than_token" << std::endl;return GREATER_THAN_TOKEN;}
 ">=" {return GREATER_THAN_EQUAL_TOKEN;}
 "." {return DOT_TOKEN;}
 "," {return COMMA_TOKEN;}
@@ -106,13 +110,13 @@ extern "C" int yylex();
 
 "0"[0-9]* {return OCTAL_LITERAL_TOKEN;}
 "0"[xX][0-9]+ {return HEX_LITERAL_TOKEN;}
-[0-9]+ {return DECIMAL_LITERAL_TOKEN;} 
+[0-9]+ {if(DEBUG) std::cout << "found decimal_literal_token" << std::endl;return DECIMAL_LITERAL_TOKEN;} 
 
 "\'"[ -~]"\'" {return CHAR_LITERAL_TOKEN;}
 
 "\""[ -~]*"\"" {return STRING_LITERAL_TOKEN;}
 
-"\$" {return COMMENT_TOKEN;}
+"\$"[ -~]*"\n" {SymbolTable::getInstance().incrementLineNumber(); /*return COMMENT_TOKEN;*/}
 
 "\n" {SymbolTable::getInstance().incrementLineNumber();}
 
