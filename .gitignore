@@ -7,4 +7,5 @@ BUILD/*
 */Build/*
 */BUILD/*
 .o
-
+OutputFromTest
+OutputFromTest/*
