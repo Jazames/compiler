@@ -4,3 +4,7 @@
 
 
 
+void SymbolTable::emitLiterals()
+{
+
+}

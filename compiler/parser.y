@@ -84,18 +84,17 @@ Expression* expr;
 %type <expr> Expression
 %type <id> IDENTIFIER_TOKEN
 
- //%right SUB_TOKEN
-%left MULT_TOKEN DIV_TOKEN MOD_TOKEN 
-%left ADD_TOKEN SUB_TOKEN
-%precedence EQUAL_TOKEN NOT_EQUAL_TOKEN LESS_THAN_TOKEN LESS_THAN_EQUAL_TOKEN GREATER_THAN_TOKEN GREATER_THAN_EQUAL_TOKEN
-%right NOT_TOKEN
-%left AND_TOKEN
 %left OR_TOKEN
-
+%left AND_TOKEN
+%right NOT_TOKEN
+%nonassoc EQUAL_TOKEN NOT_EQUAL_TOKEN LESS_THAN_TOKEN LESS_THAN_EQUAL_TOKEN GREATER_THAN_TOKEN GREATER_THAN_EQUAL_TOKEN
+%left ADD_TOKEN SUB_TOKEN
+%left MULT_TOKEN DIV_TOKEN MOD_TOKEN 
+ //%right SUB_TOKEN
  
 %%
 
-Program : ConstantDeclSection TypeDeclSection VarDeclSection ProFuncDeclSection Block {} DOT_TOKEN
+Program : ConstantDeclSection TypeDeclSection VarDeclSection ProFuncDeclSection Block DOT_TOKEN {}
         ;
 
 ConstantDeclSection : CONST_TOKEN ConstantDeclList {}
@@ -250,8 +249,6 @@ Expression : Expression OR_TOKEN Expression {}
            | LValue {}
            | Literal {}
            ;
-
-
 
 LValue : IDENTIFIER_TOKEN {}
        | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {}
