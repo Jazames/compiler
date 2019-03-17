@@ -17,6 +17,10 @@ set(cpsl_srcs
   main.cpp
   symbol_table.hpp
   symbol_table.cpp
+  tree.cpp
+  tree.hpp
+  utils.cpp
+  utils.hpp
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}
 )

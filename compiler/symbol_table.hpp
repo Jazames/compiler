@@ -7,16 +7,28 @@
 
 
 
-struct VariableSymbol
+//TODO: make this a proper class. 
+class Type
 {
-  std::string name;
-  int gp_offset;
+public:
+  int getSize();
+private:
+  int size; 
 };
 
-struct TypeSymbol
+//TODO: turn this into a proper class. 
+class Variable
 {
+public:
+  std::string getType() {return type;}
+  bool isConst() {return is_const;}
+private:
   std::string name;
+  int gp_offset;
+  bool is_const;
+  std::string type; 
 };
+
 
 struct StringLiteral
 {
@@ -31,14 +43,19 @@ public:
 	void incrementLineNumber() {line_number++;}
 	int getLineNumber() {return line_number;}
   void emitLiterals();
-  bool addVariableSymbol(std::string name);
-  VariableSymbol retrieveVariableSymbol(std::string name);
+  bool addType(std::string name);
+  bool addVariable(std::string name);
+  Variable retrieveVariableSymbol(std::string name);
+  Type retrieveTypeSymbol(std::string name);
+  int enterScope();
+  bool addStringLiteral(std::string name, std::string string);
 private:
 	int line_number;
-  std::vector<TypeSymbol> type_symbol_table;
-  std::vector<VariableSymbol> variable_symbol_table;
-  std::vector<StringLiteral> literal_table;
-  SymbolTable() : line_number(1) {}
+  int current_scope;
+  std::vector<std::map<std::string, Type> > type_symbol_table;
+  std::vector<std::map<std::string, Variable> > variable_symbol_table;
+  std::map<std::string, std::string> literal_table;
+  SymbolTable() : line_number(1), current_scope(0) {}
   ~SymbolTable() {}
 
 };

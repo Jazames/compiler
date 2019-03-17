@@ -15,6 +15,8 @@ void yyerror(const char*);
 int val;  
 char* id;
 Expression* expr;
+ExpressionList* expr_list;
+Write* write_stmt;
 }
 
 %token ARRAY_TOKEN
@@ -80,9 +82,17 @@ Expression* expr;
 %token COMMENT_TOKEN
 
  //TODO: This is broken and needs designing and this comment needs to be deleted. 
-%type <val> Literal
+%type <expr> Literal
 %type <expr> Expression
 %type <id> IDENTIFIER_TOKEN
+%type <expr_list> ExpressionList
+%type <write_stmt> WriteStatement
+%type <id> CHAR_LITERAL_TOKEN
+%type <val> DECIMAL_LITERAL_TOKEN
+%type <val> HEX_LITERAL_TOKEN
+%type <val> OCTAL_LITERAL_TOKEN
+%type <id> STRING_LITERAL_TOKEN
+
 
 %left OR_TOKEN
 %left AND_TOKEN
@@ -213,10 +223,10 @@ ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {}
 LValueList : LValue {}
            | LValue COMMA_TOKEN LValueList {}
            ;
-WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
+WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {$$ = new Write($3); $$->emit();}
                ;
-ExpressionList : Expression {}
-               | Expression COMMA_TOKEN ExpressionList {}
+ExpressionList : Expression {$$ = new ExpressionList($1);}
+               | Expression COMMA_TOKEN ExpressionList {$3->addExpression($1); $$ = $3;}
                ;
 ProcedureCall : IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
               | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
@@ -247,7 +257,7 @@ Expression : Expression OR_TOKEN Expression {}
            | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | LValue {}
-           | Literal {}
+           | Literal {$$ = $1;}
            ;
 
 LValue : IDENTIFIER_TOKEN {}
@@ -256,11 +266,11 @@ LValue : IDENTIFIER_TOKEN {}
        ;
 
 
-Literal : CHAR_LITERAL_TOKEN {}
-        | HEX_LITERAL_TOKEN {}
-        | OCTAL_LITERAL_TOKEN {}
-        | DECIMAL_LITERAL_TOKEN {}
-        | STRING_LITERAL_TOKEN { /*This might be very wrong.*/} 
+Literal : CHAR_LITERAL_TOKEN {$$ = new LiteralExpr($1, "char");}
+        | HEX_LITERAL_TOKEN {$$ = new LiteralExpr($1, "integer");}
+        | OCTAL_LITERAL_TOKEN {$$ = new LiteralExpr($1, "integer");}
+        | DECIMAL_LITERAL_TOKEN {$$ = new LiteralExpr($1, "integer");}
+        | STRING_LITERAL_TOKEN {$$ = new LiteralExpr($1, "string");} 
         ;
 
 %%

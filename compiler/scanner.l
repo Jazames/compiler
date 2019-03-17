@@ -108,15 +108,15 @@ extern "C" int yylex();
 ":=" {return ASSIGNMENT_TOKEN;}
 "%" {return MOD_TOKEN;}
 
-"0"[0-9]* {return OCTAL_LITERAL_TOKEN;}
-"0"[xX][0-9]+ {return HEX_LITERAL_TOKEN;}
-[0-9]+ {if(DEBUG) std::cout << "found decimal_literal_token" << std::endl;return DECIMAL_LITERAL_TOKEN;} 
+"0"[0-9]* {yylval.val = atoi(yytext);return OCTAL_LITERAL_TOKEN;}
+"0"[xX][0-9]+ {yylval.val = atoi(yytext);return HEX_LITERAL_TOKEN;}
+[0-9]+ {yylval.val = atoi(yytext);return DECIMAL_LITERAL_TOKEN;} 
 
-"\'"[ -~]"\'" {if(DEBUG) std::cout << "found char_literal_token" << std::endl;return CHAR_LITERAL_TOKEN;}
+"\'"[ -~]"\'" {yylval.id = strdup(yytext); return CHAR_LITERAL_TOKEN;}
 
-"\'"[ -~][nrbtf]"\'" {if(DEBUG) std::cout << "found char_literal_token" << std::endl;return CHAR_LITERAL_TOKEN;}
+"\'\\"[ -~]"\'" {yylval.id = strdup(yytext); return CHAR_LITERAL_TOKEN;}
 
-"\""[ -~]*"\"" {if(DEBUG) std::cout << "found string_literal_token" << std::endl;return STRING_LITERAL_TOKEN;}
+"\""([ !#-~]|"\\\"")*"\"" {yylval.id = strdup(yytext); return STRING_LITERAL_TOKEN;}
 
 "\$"[ -~]*"\n" {SymbolTable::getInstance().incrementLineNumber(); /*return COMMENT_TOKEN;*/}
 
@@ -125,7 +125,7 @@ extern "C" int yylex();
 
 %%
 
-
+// "\""[ -~]*"\"" {yylval.id = strdup(yytext); return STRING_LITERAL_TOKEN;}
 
 
 

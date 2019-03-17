@@ -1,0 +1,17 @@
+
+
+
+begin
+  
+  write(0,1,2,3,45,6789);
+  write('0');
+  write('\n');
+  write('\'');
+  write("wat");
+  write("wot \"in\" ternation!\n");
+  write("\nThere should be space between this line and the line above.\n");
+
+  
+end .
+
+
