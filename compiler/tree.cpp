@@ -50,8 +50,59 @@ bool typeIsBool(std::string type)
 {
 	return type.compare("boolean") == 0 || type.compare("BOOLEAN") == 0;
 }
+bool typeIsArithmetic(std::string type)
+{
+	return typeIsInt(type) || typeIsChar(type) || typeIsBool(type);
+}
 
 //Class Functions
+
+
+AddExpr::AddExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
+{
+	if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
+	{
+		std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
+		<< l->getType() << " and " << r->getType() << " at line number: "
+			<< SymbolTable::getInstance().getLineNumber() << std::endl;
+	}
+}
+
+Reg AddExpr::emit()
+{
+	if(isConst())
+	{
+		Reg regName = RegisterPool::getInstance().getRegister().getAsm();
+		Value val = l->getValue() + r->getValue();
+		std::cout << "li " << regName << ", " << val << "      # Put Literal " << val << " into register.\n";
+		return regName;
+	}
+	else
+	{
+		Reg lreg = l->emit();
+		Reg rreg = r->emit();
+		Reg sumReg = RegisterPool::getInstance().getRegister().getAsm();
+		std::cout << "addi " << sumReg << ", " << lreg << ", " << rreg << "      #Add two registers.\n";
+		return sumReg;
+	}
+}
+
+Value AddExpr::getValue() 
+{
+	if(isConst())
+	{
+		return l->getValue() + r->getValue();
+	}
+}	
+
+std::string AddExpr::getType()
+{
+	if(r->getType() == l->getType())
+	{
+		return r->getType();
+	}
+}
+
 
 LiteralExpr::LiteralExpr(Value val, std::string type) : Expression(), val(val), type(type) 
 {
@@ -70,7 +121,7 @@ LiteralExpr::LiteralExpr(std::string value, std::string type) : Expression(), va
 	}
 	if(typeIsString(type))
 	{
-		std::cerr << "DEBUG: String literal found: " << s_val << std::endl;
+		//std::cerr << "DEBUG: String literal found: " << s_val << std::endl;
 	}
 }
 
@@ -115,7 +166,7 @@ Write::Write(ExpressionList* el)
 
 void Write::emit()
 {
-	
+	//TODO: put checks to see if expression methods are null, and if so, fail or something. 	
 	std::cout << "#Write Statement\n";
 	for(int i = 0; i < expression_list.size(); i++)
 	{

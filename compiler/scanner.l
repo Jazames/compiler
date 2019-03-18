@@ -125,7 +125,7 @@ extern "C" int yylex();
 
 %%
 
-// "\""[ -~]*"\"" {yylval.id = strdup(yytext); return STRING_LITERAL_TOKEN;}
+
 
 
 

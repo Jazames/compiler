@@ -11,7 +11,8 @@ begin
   write("wot \"in\" ternation!\n");
   write("\nThere should be space between this line and the line above.\n");
 
-  
+  write("2+2=",2+2,'\n');
+
 end .
 
 

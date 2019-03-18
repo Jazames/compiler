@@ -242,7 +242,7 @@ Expression : Expression OR_TOKEN Expression {}
            | Expression GREATER_THAN_EQUAL_TOKEN Expression {}
            | Expression LESS_THAN_TOKEN Expression {}
            | Expression GREATER_THAN_TOKEN Expression {}
-           | Expression ADD_TOKEN Expression {}
+           | Expression ADD_TOKEN Expression {$$ = new AddExpr($1,$3);}
            | Expression SUB_TOKEN Expression {}
            | Expression MULT_TOKEN Expression {}
            | Expression DIV_TOKEN Expression {}
