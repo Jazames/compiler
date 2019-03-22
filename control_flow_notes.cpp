@@ -46,3 +46,17 @@ bne nextElseIf2
 j ifEnd
 nextElseIf2
 ifEnd
+
+//For loop:
+follow while statement. 
+
+
+
+
+
+
+
+
+
+
+
