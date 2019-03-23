@@ -9,3 +9,5 @@ BUILD/*
 .o
 OutputFromTest
 OutputFromTest/*
+.DS_Store
+
