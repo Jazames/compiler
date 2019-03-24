@@ -40,3 +40,51 @@ Register RegisterPool::getRegister()
 	}
 	std::cerr << "ERROR: Ran out of Registers." << std::endl;
 }
+
+//Helper Functions
+char charStringToChar(std::string s_val)
+{
+	if(s_val[1] == '\\')
+	{
+		switch(s_val[2])
+		{
+			case 'n':
+			return '\n';
+			case 'r':
+			return '\r';
+			case 'b':
+			return '\b';
+			case 't':
+			return '\t';
+			case 'f':
+			return '\f';
+			default:
+			return s_val[2];
+		}
+	}
+	else
+	{
+		return s_val[1];
+	}
+}
+
+bool typeIsInt(std::string type)
+{
+	return type.compare("integer") == 0 || type.compare("INTEGER") == 0;
+}
+bool typeIsString(std::string type)
+{
+	return type.compare("string") == 0 || type.compare("STRING") == 0;
+}
+bool typeIsChar(std::string type)
+{
+	return type.compare("char") == 0 || type.compare("CHAR") == 0;
+}
+bool typeIsBool(std::string type)
+{
+	return type.compare("boolean") == 0 || type.compare("BOOLEAN") == 0;
+}
+bool typeIsArithmetic(std::string type)
+{
+	return typeIsInt(type) || typeIsChar(type) || typeIsBool(type);
+}

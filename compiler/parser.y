@@ -17,6 +17,11 @@ char* id;
 Expression* expr;
 ExpressionList* expr_list;
 Write* write_stmt;
+LValue* lval;
+LValueList* lval_list;
+IdentList* ident_list;
+Parse_Type* p_type;
+Read* read_stmt;
 }
 
 %token ARRAY_TOKEN
@@ -92,7 +97,14 @@ Write* write_stmt;
 %type <val> HEX_LITERAL_TOKEN
 %type <val> OCTAL_LITERAL_TOKEN
 %type <id> STRING_LITERAL_TOKEN
-
+%type <lval> LValue
+%type <lval_list> LValueList
+%type <ident_list> IdentList
+%type <p_type> Type
+%type <p_type> SimpleType
+%type <p_type> ArrayType
+%type <p_type> RecordType
+%type <read_stmt> ReadStatement
 
 %left OR_TOKEN
 %left AND_TOKEN
@@ -124,22 +136,22 @@ TypeDeclList : TypeDeclList TypeDecl {}
              ;
 TypeDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Type SEMICOLON_TOKEN {}
          ;
-Type : SimpleType {}
+Type : SimpleType {$$ = $1;}
      | RecordType {}
      | ArrayType {}
      ;
-SimpleType : IDENTIFIER_TOKEN {}
+SimpleType : IDENTIFIER_TOKEN {$$ = new SimpleType($1);}
            ;
 RecordType : RECORD_TOKEN RecordList END_TOKEN {}
 RecordList : RecordList RecordLine {}
-           | {} {}
+           | {} 
            ;
 RecordLine : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {}
            ;
 ArrayType : ARRAY_TOKEN OPEN_BRACKET_TOKEN Expression COLON_TOKEN Expression CLOSE_BRACKET_TOKEN OF_TOKEN Type {}
           ;
-IdentList : IDENTIFIER_TOKEN  {}
-          | IDENTIFIER_TOKEN COMMA_TOKEN IdentList {}
+IdentList : IDENTIFIER_TOKEN  {$$ = new IdentList($1);}
+          | IDENTIFIER_TOKEN COMMA_TOKEN IdentList {$3->addIdent($1); $$ = $3;}
           ;
 
 VarDeclSection : VAR_TOKEN VarDeclList {}
@@ -148,7 +160,7 @@ VarDeclSection : VAR_TOKEN VarDeclList {}
 VarDeclList : VarDeclList VarDecl {}
             | {}
             ;
-VarDecl : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {}
+VarDecl : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {addVarsToSymbolTable($1, $3);}
         ;
 
 ProFuncDeclSection : ProFuncDeclList {}
@@ -196,7 +208,7 @@ Statement : Assignment {}
           | ProcedureCall {}
           | NullStatement {}
           ;
-Assignment : LValue ASSIGNMENT_TOKEN Expression {}
+Assignment : LValue ASSIGNMENT_TOKEN Expression {emitAssignmentStatment($1, $3);}
            ;
 IfStatement : IF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence ElseSequence END_TOKEN {}
             ;
@@ -218,10 +230,10 @@ StopStatement : STOP_TOKEN {}
 ReturnStatement : RETURN_TOKEN Expression {}
                 | RETURN_TOKEN {}
                 ;
-ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {}
+ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {$$ = new Read($3); $$->emit();}
               ;
-LValueList : LValue {}
-           | LValue COMMA_TOKEN LValueList {}
+LValueList : LValue {$$ = new LValueList($1);}
+           | LValue COMMA_TOKEN LValueList {$3->addLValue($1); $$ = $3;}
            ;
 WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {$$ = new Write($3); $$->emit();}
                ;
@@ -256,11 +268,11 @@ Expression : Expression OR_TOKEN Expression {}
            | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | LValue {}
+           | LValue {$$ = new LValueExpr($1);}
            | Literal {$$ = $1;}
            ;
 
-LValue : IDENTIFIER_TOKEN {}
+LValue : IDENTIFIER_TOKEN {$$ = new LValue($1);}
        | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {}
        | LValue DOT_TOKEN IDENTIFIER_TOKEN {}
        ;

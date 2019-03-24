@@ -1,5 +1,6 @@
-
-
+var
+  a, b, c : integer;
+  d : char;
 
 begin
   
@@ -12,6 +13,22 @@ begin
   write("\nThere should be space between this line and the line above.\n");
 
   write("2+2=",2+2,'\n');
+
+  a := 2;
+  b := 3;
+  c := 0x99;
+  write("a=2,b=3,c=0xFF\n");
+  write("a+b=",a+b,'\n','\n');
+
+  read(a,b,c);
+  write("a=",a,'\n');
+  write("b=",b,'\n');
+  write("c=",c,'\n');
+  write("a+b+c=",a+b+c,"\n\n");
+
+  write("enter a character\n");
+  read(d);
+  write("d=",d,"\n\n");
 
 end .
 

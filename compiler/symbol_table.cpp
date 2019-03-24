@@ -7,10 +7,57 @@
 bool SymbolTable::addStringLiteral(std::string name, std::string string)
 {
   literal_table.insert(std::pair<std::string, std::string>(name,string));
-
   return true;
 }
 
+bool SymbolTable::addVariable(std::string name, std::string type)
+{
+  Variable variable(false, type, current_global_offset);
+  current_global_offset += retrieveTypeSymbol(type).getSize();
+  variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
+  return true;
+}
+
+bool SymbolTable::addVariableConstant(std::string name, std::string type, ConstValue value)
+{
+  Variable variable(true, type, current_global_offset);
+  if(variable_symbol_table.size() > 2)
+  {
+    current_local_offset += retrieveTypeSymbol(type).getSize();
+  }
+  else
+  {
+    current_global_offset += retrieveTypeSymbol(type).getSize();
+  }
+  variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
+  //TODO: assign value to area of memory. 
+    //Probably emit assembly to shove the value into the heap? 
+  return true;
+}
+
+Variable SymbolTable::retrieveVariableSymbol(std::string id)
+{
+  return retrieveVariableSymbolAndScope(id).second;
+}
+
+bool SymbolTable::addType(std::string name, Type type)
+{
+  type_symbol_table[type_symbol_table.size()-1][name] = type;
+}
+
+Type SymbolTable::retrieveTypeSymbol(std::string id)
+{
+  for(auto iter = type_symbol_table.rbegin(); iter != type_symbol_table.rend(); ++iter)
+  {
+    auto found = iter->find(id);
+    if(found != iter->end()) 
+    {
+      return found->second;
+    }
+  }
+  std::cerr << "Error: Undefined Type ID: " << id << std::endl;
+  exit(0);
+}
 
 void SymbolTable::emitLiterals()
 {
@@ -28,6 +75,45 @@ int SymbolTable::enterScope()
 {
   type_symbol_table.push_back(std::map<std::string, Type>());
   variable_symbol_table.push_back(std::map<std::string, Variable>());
-
+  current_local_offset = 0;//TODO: Make this a stack that can push and pop.
   return variable_symbol_table.size();
+}
+
+int SymbolTable::leaveScope()
+{
+  type_symbol_table.pop_back();
+  variable_symbol_table.pop_back();
+  current_local_offset = 0;//TODO: Make this a stack that can be pushed and popped. 
+  return variable_symbol_table.size();
+}
+
+std::string SymbolTable::getVariableAddress(std::string name)
+{
+  auto variableAndScope = retrieveVariableSymbolAndScope(name);
+  if(variableAndScope.first < 2) //That means it's global scope.
+  {
+    return std::to_string(variableAndScope.second.getOffset()) + "($gp)";
+  }
+  else //Else it's local scope. 
+  {
+    return std::to_string(variableAndScope.second.getOffset()) + "($fp)";
+  }
+}
+
+
+std::pair<int,Variable> SymbolTable::retrieveVariableSymbolAndScope(std::string id)
+{
+  int scope = variable_symbol_table.size() - 1;
+  for(auto iter = variable_symbol_table.rbegin(); iter != variable_symbol_table.rend(); ++iter)
+  {
+    auto found = iter->find(id);
+    if(found != iter->end()) 
+    {
+      return std::pair<int, Variable>(scope,found->second);
+    }
+    scope--;
+  }
+  std::cerr << "Error: Undefined Variable ID: " << id << std::endl;
+  //throw "undefined id";
+  exit(0);
 }

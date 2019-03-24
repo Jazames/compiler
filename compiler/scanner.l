@@ -81,7 +81,7 @@ extern "C" int yylex();
 "write"     {return WRITE_TOKEN;}
 "WRITE"     {return WRITE_TOKEN;}
 
-[a-zA-Z][a-zA-Z0-9_]* {if(DEBUG) std::cout << "found id_token" << std::endl;yylval.id = strdup(yytext);return IDENTIFIER_TOKEN;}
+[a-zA-Z][a-zA-Z0-9_]* {yylval.id = strdup(yytext);return IDENTIFIER_TOKEN;}
 
 
 "+" {return ADD_TOKEN;}
@@ -109,7 +109,7 @@ extern "C" int yylex();
 "%" {return MOD_TOKEN;}
 
 "0"[0-9]* {yylval.val = atoi(yytext);return OCTAL_LITERAL_TOKEN;}
-"0"[xX][0-9]+ {yylval.val = atoi(yytext);return HEX_LITERAL_TOKEN;}
+"0"[xX][0-9A-Fa-f]+ {yylval.val = atoi(yytext);return HEX_LITERAL_TOKEN;}
 [0-9]+ {yylval.val = atoi(yytext);return DECIMAL_LITERAL_TOKEN;} 
 
 "\'"[ -~]"\'" {yylval.id = strdup(yytext); return CHAR_LITERAL_TOKEN;}

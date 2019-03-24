@@ -6,12 +6,15 @@
 #include <map>
 
 
+using ConstValue = int;
 
 //TODO: make this a proper class. 
 class Type
 {
 public:
-  int getSize();
+  Type() : size(0) {}
+  Type(int size) : size(size) {}
+  int getSize() {return size;}
 private:
   int size; 
 };
@@ -20,44 +23,45 @@ private:
 class Variable
 {
 public:
+  Variable() : is_const(false), type(""), gp_offset(0) {}
+  Variable(bool is_const, std::string type, int gp_offset) : is_const(is_const), type(type), gp_offset(gp_offset) {}
   std::string getType() {return type;}
   bool isConst() {return is_const;}
+  int getOffset() {return gp_offset;}
 private:
-  std::string name;
+  //std::string name;
   int gp_offset;
   bool is_const;
   std::string type; 
 };
 
-
-struct StringLiteral
-{
-  std::string name;
-  std::string literal;
-};
-
-class SymbolTable
+class SymbolTable//Will also store local variables in here, but those will be offset from the frame pointer. 
 {
 public:
   static SymbolTable& getInstance() {static SymbolTable instance; return instance;}
 	void incrementLineNumber() {line_number++;}
 	int getLineNumber() {return line_number;}
   void emitLiterals();
-  bool addType(std::string name);
-  bool addVariable(std::string name);
+  bool addType(std::string name, Type type);
+  bool addVariable(std::string name, std::string type);
+  bool addVariableConstant(std::string name, std::string type, ConstValue value);
   Variable retrieveVariableSymbol(std::string name);
   Type retrieveTypeSymbol(std::string name);
   int enterScope();
+  int leaveScope();
   bool addStringLiteral(std::string name, std::string string);
+  std::string getVariableAddress(std::string name);
 private:
 	int line_number;
-  int current_scope;
+  //int current_scope;
+  int current_global_offset;
+  int current_local_offset;
+  std::pair<int,Variable> retrieveVariableSymbolAndScope(std::string name);
   std::vector<std::map<std::string, Type> > type_symbol_table;
   std::vector<std::map<std::string, Variable> > variable_symbol_table;
   std::map<std::string, std::string> literal_table;
-  SymbolTable() : line_number(1), current_scope(0) {}
+  SymbolTable() : line_number(1), current_global_offset(0) {}
   ~SymbolTable() {}
-
 };
 
 

@@ -21,6 +21,12 @@ set(cpsl_srcs
   tree.hpp
   utils.cpp
   utils.hpp
+  expressions.hpp
+  expressions.cpp
+  statements.hpp
+  statements.cpp
+  leaves.hpp
+  leaves.cpp
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}
 )
