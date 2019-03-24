@@ -14,13 +14,13 @@ void Assignment::emit()
     Register reg = RegisterPool::getInstance().getRegister();
     auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
     std::cout << "li " << reg.getAsm() << ", " << value   << "      #Put constant expression into register\n";
-    std::cout << "sw " << reg.getAsm() << ", " << address << "      #Store value at address\n";
+    std::cout << "sw " << reg.getAsm() << ", " << address << "      #Store value at address\n\n";
   }
   else 
   {
     Register exprReg = e->emit();
     auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
-    std::cout << "sw " << exprReg.getAsm() << ", " << address << "      #Store value at address\n";
+    std::cout << "sw " << exprReg.getAsm() << ", " << address << "      #Store value at address\n\n";
   }
 }
 
@@ -64,6 +64,7 @@ void Read::emit()
       exit(0);
     }
   }
+  std::cout << "\n";//space after the statement. 
   //TODO: Deallocate LValues. 
 }
 
@@ -110,16 +111,3 @@ void Write::emit()
   //Once it's all cleaned up, deallocate the memory. 
 }
 
-
-
-
-//Functions
-
-void emitAssignmentStatment(LValue* lval, Expression* e)
-{
-  std::cout << "#Assignment Statement\n";
-  Register reg = e->emit();
-  std::cout << "sw " << reg.getAsm() << ", ";
-  std::cout << SymbolTable::getInstance().getVariableAddress(lval->getID());
-  std::cout << "     #Assign " << lval->getID() << "some value\n";
-}

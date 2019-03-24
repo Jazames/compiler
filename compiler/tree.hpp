@@ -61,6 +61,16 @@ public:
 
 
 
+class IdentList {
+public:
+  IdentList(std::string id) : id_list() {id_list.push_back(id);}
+  std::string get(int i){return id_list[i];}
+  void addIdent(std::string id) {id_list.push_back(id);}
+  int getSize() {return id_list.size();}
+private:
+  std::vector<std::string> id_list;
+};
+
 
 //Functions:
 void addVarsToSymbolTable(IdentList* identList, Parse_Type* type);

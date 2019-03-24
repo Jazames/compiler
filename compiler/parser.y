@@ -22,6 +22,7 @@ LValueList* lval_list;
 IdentList* ident_list;
 Parse_Type* p_type;
 Read* read_stmt;
+Assignment* assign_stmt;
 }
 
 %token ARRAY_TOKEN
@@ -105,6 +106,7 @@ Read* read_stmt;
 %type <p_type> ArrayType
 %type <p_type> RecordType
 %type <read_stmt> ReadStatement
+%type <assign_stmt> Assignment
 
 %left OR_TOKEN
 %left AND_TOKEN
@@ -208,7 +210,7 @@ Statement : Assignment {}
           | ProcedureCall {}
           | NullStatement {}
           ;
-Assignment : LValue ASSIGNMENT_TOKEN Expression {emitAssignmentStatment($1, $3);}
+Assignment : LValue ASSIGNMENT_TOKEN Expression {$$ = new Assignment($1, $3); $$->emit();}
            ;
 IfStatement : IF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence ElseSequence END_TOKEN {}
             ;

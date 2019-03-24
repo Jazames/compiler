@@ -75,8 +75,5 @@ class Null : public Statement
 };
 
 
-//Functions:
-void emitAssignmentStatment(LValue* lval, Expression* e);
-
 
 #endif
