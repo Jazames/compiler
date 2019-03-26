@@ -85,6 +85,34 @@ See photo taken on March 18th for assembly.
 
 
 
+activation record needs:
+	local variables -> above frame pointer because only the function cares about these. 
+	return address -> needs to be below the frame pointer because only the caller knows this.
+		also needs to be the same after call as they were before function call
+	frame pointer can be either above or below 
+		also needs to be the same after call as they were before function call
+	somewhere to spill registers -> Can be in either place, but recommended below, because the caller already knows what registers it is using. 
+		also needs to be the same after call as they were before function call
+	return value  -> below frame pointer because the caller needs this. 
+	parameters -> below frame pointer because the caller needs to set these up. 
+
+
+
+
+//Dr. Sundbergs recommended layout: 
+
+locals
+				<- fp 
+params 
+return 
+spill 
+
+
+
+Function calls by reference: 
+LValues should probabably be able to keep track of whether they are references or copies. 
+	//James thinks it should be put wherever the LValue emit code lives. Which hopefully is in the LValue. 
+	//If a function is passed a non-lvalue where it should be given pass by reference, then an error should be thrown. 
 
 
 
@@ -94,18 +122,49 @@ See photo taken on March 18th for assembly.
 
 
 
+//Swap mips example:
+
+.glbl main 
+main: 
+	la $gp, GA 
+	j realmain
+swap:
+	addi$sp, $sp, -4
+	lw $t0, 0($fp)
+	lw $t0, 0($t0)
+	sw $t0, -4($fp)
+	lw $t0, 4($fp)
+	lw $t0, 0($t0) #doing the swap somewhere here
+	lw $t1, 0($fp)
+	sw $t0, 0($t1)
+	lw $t1, 4($fp)
+	sw $t0, 0($t1)
+	addi $sp, $sp, 4
+	jr $ra
+realmain:
+	#initial setup
+	li $to, 42
+	sw $t0, 0($gp)
+	li $0, 24
+	sw $50, 4($gp)
 
 
+	addi $sp $sp -16
+	sw $ra 12($sp)
+	sw $fp 8($sp)
+	addi $t0, $gp, 0
+	sw $t0, 0($p)
+	addi $t0, $gp, 4
+	sw $t0, 4($gp)
+	ori $fp, $sp, 0
+	jal swap 
+	lw $ra, 12($sp)
+	lw $fp, 8($sp)
+	addi $sp, $sp, 16
 
-
-
-
-
-
-
-
-
-
+.data
+.align 4
+GA:
 
 
 

@@ -72,6 +72,7 @@ private:
 class Null : public Statement
 {
   //Null Statements don't do anything. 
+  //They don't really need to exist either. 
 };
 
 

@@ -50,7 +50,7 @@ int main()
 
   std::cout << "#terminate program\n";
   std::cout << "li $v0, 10\nsyscall\n\n";
-  std::cout << ".data\n\n";
+  std::cout << ".data\n.align 4\n\n";
   sym_tab.emitLiterals();
   std::cout << "GlobalArea:\n\n";
 };

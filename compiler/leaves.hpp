@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-class LValue
+class LValue //LValues are used by read statements, assignment statements, and can be an expression. May want to 
 {
 public:
   LValue(std::string id) : id(id) {}
