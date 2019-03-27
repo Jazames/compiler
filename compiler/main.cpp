@@ -17,10 +17,10 @@ int main()
   SymbolTable& sym_tab = SymbolTable::getInstance();
   //Get scope ready for predefined things
   sym_tab.enterScope();
-  Type intType(4);
-  Type charType(4);
-  Type boolType(4);
-  Type stringType(4);//Todo wut? 
+  SimpleType* intType    = new SimpleType("integer");
+  SimpleType* charType   = new SimpleType("char");   
+  SimpleType* boolType   = new SimpleType("boolean");
+  SimpleType* stringType = new SimpleType("string"); 
 
   sym_tab.addType("integer", intType);
   sym_tab.addType("INTEGER", intType);

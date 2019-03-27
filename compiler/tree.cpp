@@ -17,7 +17,7 @@
 
 //Header file functions
 
-void addVarsToSymbolTable(IdentList* identList, Parse_Type* type)
+void addVarsToSymbolTable(IdentList* identList, Type* type)
 {
 	SymbolTable& sym_tab = SymbolTable::getInstance();
 	std::string typeID = type->getTypeID();

@@ -20,7 +20,7 @@ Write* write_stmt;
 LValue* lval;
 LValueList* lval_list;
 IdentList* ident_list;
-Parse_Type* p_type;
+Type* p_type;
 Read* read_stmt;
 Assignment* assign_stmt;
 }
@@ -136,7 +136,7 @@ TypeDeclSection : TYPE_TOKEN TypeDeclList
 TypeDeclList : TypeDeclList TypeDecl {}
              | {}
              ;
-TypeDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Type SEMICOLON_TOKEN {}
+TypeDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Type SEMICOLON_TOKEN {SymbolTable::getInstance().addType($1, $3);}
          ;
 Type : SimpleType {$$ = $1;}
      | RecordType {}
@@ -266,8 +266,8 @@ Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
            | OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN  {$$ = new ParenthesisExpr($2);}
            | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
            | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
-           | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new ChrExpr($3);}
+           | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new OrdExpr($3);}
            | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
            | LValue {$$ = new LValueExpr($1);}

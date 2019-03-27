@@ -53,27 +53,41 @@ private:
 
 
 
-
-class Parse_Type
+/*
+class Type
 {
 public:
-  Parse_Type() = default;
-  virtual ~Parse_Type() = default;
+  Type() : size(0) {}
+  Type(int size) : size(size) {}
+  int getSize() {return size;}
+private:
+  int size; 
+};
+*/
+
+class Type
+{
+public:
+  Type() = default;
+  virtual ~Type() = default;
+  virtual int getSize() = 0;
   virtual std::string getTypeID() = 0;
 private:
   
 };
 
-class SimpleType : public Parse_Type
+class SimpleType : public Type
 {
 public:
-  SimpleType(std::string id) : Parse_Type(), id(id) {}
+  SimpleType(std::string id) : Type(), id(id), size(4) {}
   std::string getTypeID() {return id;}
+  int getSize() {return size;}
 private:
   std::string id;
+  int size;
 };
 
-class ArrayType : public Parse_Type
+class ArrayType : public Type
 {
 public:
 
@@ -81,7 +95,7 @@ private:
 
 };
 
-class RecordType : public Parse_Type
+class RecordType : public Type
 {
 public:
 

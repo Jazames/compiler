@@ -15,8 +15,8 @@ bool SymbolTable::addStringLiteral(std::string name, std::string string)
 
 bool SymbolTable::addVariable(std::string name, std::string type)
 {
-  Variable variable(false, type, current_global_offset);
-  current_global_offset += retrieveTypeSymbol(type).getSize();
+  Variable variable(false, type, current_global_offset, 0);
+  current_global_offset += retrieveTypeSymbol(type)->getSize();
   variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
   return true;
 }
@@ -27,12 +27,12 @@ bool SymbolTable::addVariableConstant(std::string name, std::string type, ConstV
   if(variable_symbol_table.size() > 2)
   {
     variable = Variable(true, type, current_local_offset, value);
-    current_local_offset += retrieveTypeSymbol(type).getSize();
+    current_local_offset += retrieveTypeSymbol(type)->getSize();
   }
   else
   {
     variable = Variable(true, type, current_global_offset, value);
-    current_global_offset += retrieveTypeSymbol(type).getSize();
+    current_global_offset += retrieveTypeSymbol(type)->getSize();
   }
   variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
 
@@ -49,12 +49,12 @@ Variable SymbolTable::retrieveVariableSymbol(std::string id)
   return retrieveVariableSymbolAndScope(id).second;
 }
 
-bool SymbolTable::addType(std::string name, Type type)
+bool SymbolTable::addType(std::string name, Type* type)
 {
   type_symbol_table[type_symbol_table.size()-1][name] = type;
 }
 
-Type SymbolTable::retrieveTypeSymbol(std::string id)
+Type* SymbolTable::retrieveTypeSymbol(std::string id)
 {
   for(auto iter = type_symbol_table.rbegin(); iter != type_symbol_table.rend(); ++iter)
   {
@@ -82,7 +82,7 @@ void SymbolTable::emitLiterals()
 
 int SymbolTable::enterScope()
 {
-  type_symbol_table.push_back(std::map<std::string, Type>());
+  type_symbol_table.push_back(std::map<std::string, Type*>());
   variable_symbol_table.push_back(std::map<std::string, Variable>());
   current_local_offset = 0;//TODO: Make this a stack that can push and pop.
   return variable_symbol_table.size();
@@ -116,12 +116,12 @@ bool SymbolTable::addStringConstant(std::string id, std::string type, std::strin
   if(variable_symbol_table.size() > 2)
   {
     variable = Variable(true, type, current_local_offset, 0);
-    current_local_offset += retrieveTypeSymbol(type).getSize();
+    current_local_offset += retrieveTypeSymbol(type)->getSize();
   }
   else
   {
     variable = Variable(true, type, current_global_offset, 0);
-    current_global_offset += retrieveTypeSymbol(type).getSize();
+    current_global_offset += retrieveTypeSymbol(type)->getSize();
   }
   std::string label = getNewStringLabel();
   addStringLiteral(label, string_value);

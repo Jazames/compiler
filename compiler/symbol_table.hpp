@@ -4,22 +4,11 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "leaves.hpp"
 
 
 using ConstValue = int;
 
-//TODO: make this a proper class. 
-class Type
-{
-public:
-  Type() : size(0) {}
-  Type(int size) : size(size) {}
-  int getSize() {return size;}
-private:
-  int size; 
-};
-
-//TODO: turn this into a proper class. 
 class Variable
 {
 public:
@@ -47,11 +36,11 @@ public:
 	void incrementLineNumber() {line_number++;}
 	int getLineNumber() {return line_number;}
   void emitLiterals();
-  bool addType(std::string name, Type type);
+  bool addType(std::string name, Type* type);
   bool addVariable(std::string name, std::string type);
   bool addVariableConstant(std::string name, std::string type, ConstValue value);
   Variable retrieveVariableSymbol(std::string name);
-  Type retrieveTypeSymbol(std::string name);
+  Type* retrieveTypeSymbol(std::string name);
   int enterScope();
   int leaveScope();
   bool addStringLiteral(std::string name, std::string string);
@@ -63,7 +52,7 @@ private:
   int current_global_offset;
   int current_local_offset;
   std::pair<int,Variable> retrieveVariableSymbolAndScope(std::string name);
-  std::vector<std::map<std::string, Type> > type_symbol_table;
+  std::vector<std::map<std::string, Type*> > type_symbol_table;
   std::vector<std::map<std::string, Variable> > variable_symbol_table;
   std::map<std::string, std::string> literal_table;
   SymbolTable() : line_number(1), current_global_offset(0) {}

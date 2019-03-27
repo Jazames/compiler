@@ -157,7 +157,7 @@ std::string EqualToExpr::getType()
 {
   if(r->getType() == l->getType())
   {
-    return r->getType();
+    return "boolean";
   }
   else
   {
@@ -212,7 +212,7 @@ std::string NotEqualToExpr::getType()
 {
   if(r->getType() == l->getType())
   {
-    return r->getType();
+    return "boolean";
   }
   else
   {
@@ -264,7 +264,7 @@ std::string LessThanEqualToExpr::getType()
 {
   if(r->getType() == l->getType())
   {
-    return r->getType();
+    return "boolean";
   }
   else
   {
@@ -318,7 +318,7 @@ std::string GreaterThanEqualToExpr::getType()
 {
   if(r->getType() == l->getType())
   {
-    return r->getType();
+    return "boolean";
   }
   else
   {
@@ -370,7 +370,7 @@ std::string LessThanExpr::getType()
 {
   if(r->getType() == l->getType())
   {
-    return r->getType();
+    return "boolean";
   }
   else
   {
@@ -422,7 +422,7 @@ std::string GreaterThanExpr::getType()
 {
   if(r->getType() == l->getType())
   {
-    return r->getType();
+    return "boolean";
   }
   else
   {
@@ -845,11 +845,57 @@ std::string ParenthesisExpr::getType()
   return e->getType();
 }
 
+//Function call expression
 
 
-//Other stuff
+//Modifying expressions
+
+ChrExpr::ChrExpr(Expression* e) : Expression(), e(e) 
+{
+  //No type checks necessary. 
+}
+
+Register* ChrExpr::emit()
+{
+  e->emit();
+}
+
+Value ChrExpr::getValue() 
+{
+  return e->getValue();
+} 
+
+std::string ChrExpr::getType()
+{
+  return "char";
+}
+
+OrdExpr::OrdExpr(Expression* e) : Expression(), e(e) 
+{
+  //No type checks necessary. 
+}
+
+Register* OrdExpr::emit()
+{
+  e->emit();
+}
+
+Value OrdExpr::getValue() 
+{
+  e->getValue();
+} 
+
+std::string OrdExpr::getType()
+{
+  return "integer";
+}
 
 
+
+
+
+
+//Expressions with single value
 
 Register* LValueExpr::emit() 
 {
@@ -858,7 +904,7 @@ Register* LValueExpr::emit()
     Register* reg = RegisterPool::getInstance().getRegister();
     std::cout << "la " << reg->getAsm() << ", ";
     std::cout << SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).getStringLabel();
-    std::cout << "     # Load address of String literal into LVal\n"
+    std::cout << "     # Load address of String literal into LVal\n";
     return reg;
   }
   else
@@ -886,7 +932,9 @@ Value LValueExpr::getValue()
 
 std::string LValueExpr::getType()
 {
-  return SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).getType();
+  std::string type = SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).getType();
+  auto ptr = SymbolTable::getInstance().retrieveTypeSymbol(type);
+  return ptr->getTypeID();
 }
 
 LiteralExpr::LiteralExpr(Value val, std::string type) : Expression(), val(val), type(type) 

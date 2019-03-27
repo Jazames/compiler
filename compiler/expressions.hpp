@@ -229,7 +229,7 @@ private:
 class ChrExpr : public Expression
 {
 public:
-  ChrExpr(Expression* e) : Expression(), e(e){}
+  ChrExpr(Expression* e);// : Expression(), e(e){}
   Reg* emit() override; 
   bool isConst() override {return e->isConst();}
   Value getValue() override;
@@ -241,7 +241,7 @@ private:
 class OrdExpr : public Expression
 {
 public:
-  OrdExpr(Expression* e) : Expression(), e(e){}
+  OrdExpr(Expression* e);// : Expression(), e(e){}
   Reg* emit() override; 
   bool isConst() override {return e->isConst();}
   Value getValue() override;
