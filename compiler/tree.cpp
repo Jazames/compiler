@@ -12,9 +12,6 @@
 //Class Functions
 
 
-
-
-
 //Header file functions
 
 void addVarsToSymbolTable(IdentList* identList, Type* type)

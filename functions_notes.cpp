@@ -167,6 +167,96 @@ realmain:
 GA:
 
 
+//Swap again
+
+
+//source code:
+
+type
+	point = array [1:2] of integer (size 8)
+
+var
+	point a; (0 $gp)
+	point b; (8 $gp)
+
+proc swap(ref point a (0 $fp), ref point b(8 $fp))
+var
+	point t;
+begin	
+	t:= a;
+	a:= b;
+	b:= t;
+end
+
+begin
+	a[1] := 15;
+	a[2] := 42;
+	b[1] := 33;
+	b[2] := 47;
+
+	swap(a,b)
+end.
+
+//Symbol Table notes
+addresses of variables given in parenthesis after varibale declarations. 
+
+
+
+
+//output assembly
+.globl main 
+main: j realmain
+swap: 
+	$addi $sp, $sp, -8 # a @ 0($fp), b @ 4($sp)
+	lw $t0, 0($fp) #address of a
+	lw $t1, 0($t0) 
+	sw $t1, -8($fp)
+	lw $t1, 4($t0)
+	sw $t1, -4($fp) # t:= a;
+	lw $t0, 0($fp) $address of a
+	lw $t1, 4($fp) #address of b
+	lw $t2, 0($t1)
+	sw $t2, 0($t0)
+	lw $t2, 4($t1)
+	sw $t2, 4($t1)
+	sw $t2, 4($t0) # a:= b
+	lw $t0, 4($fp) address of b
+	lw $t1, -8($fp)
+	sw $t1, 0($fp)
+	lw $t2, -4($fp)
+	sw $t2, r($t0) #b := t
+	addi $sp, $sp, 8
+	jr $ra
+
+realmain:
+	la $gp, GArea
+	li $t0, 15
+	sw $t0, 0($gp) #a[1] := 15
+	li $t0, 42
+	sw $t0, 4($gp) #a[1] := 42
+	li $t0, 33
+	sw $t0, 8($gp) #a[1] := 33
+	li $t0, 47
+	sw $t0, 12($gp) #a[1] := 47
+
+	#function call
+	addi $sp, $sp -16
+	sw $ra, 8($sp)
+	sw $fp, 12($sp)
+		#local variables
+	addi $t0, $gp, 0 #address of a
+	sw $t0, 0($sp)
+	addi $t0, $gp, 8 #address of b
+	sw $t0, 4($sp)
+		#adjust frame pointer
+	move $fp, $sp 
+	jal swap
+	lw $ra, 8($sp)
+	lw $fp, 12($sp)
+  addi $sp, $sp, 16
+.data
+.align 4
+GArea:
 
 
 
