@@ -127,7 +127,7 @@ ConstantDeclSection : CONST_TOKEN ConstantDeclList {}
 ConstantDeclList : ConstantDeclList ConstantDecl {}
                  | {}
                  ;
-ConstantDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Expression SEMICOLON_TOKEN {}
+ConstantDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Expression SEMICOLON_TOKEN {addConstantToSymbolTable($1, $3);}
              ;
 
 TypeDeclSection : TYPE_TOKEN TypeDeclList
@@ -227,7 +227,7 @@ RepeatStatement : REPEAT_TOKEN StatementSequence UNTIL_TOKEN Expression {}
 ForStatement : FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression TO_TOKEN     Expression DO_TOKEN StatementSequence END_TOKEN {}
              | FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression DOWNTO_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {}
              ;
-StopStatement : STOP_TOKEN {}
+StopStatement : STOP_TOKEN {std::cout << "#terminate program\n";std::cout << "li $v0, 10\nsyscall\n\n";}
               ;
 ReturnStatement : RETURN_TOKEN Expression {}
                 | RETURN_TOKEN {}
@@ -248,22 +248,22 @@ ProcedureCall : IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOK
 NullStatement : {}
               ;
 
-Expression : Expression OR_TOKEN Expression {}
-           | Expression AND_TOKEN Expression {}
-           | Expression EQUAL_TOKEN Expression {}
-           | Expression NOT_EQUAL_TOKEN Expression {}
-           | Expression LESS_THAN_EQUAL_TOKEN Expression {}
-           | Expression GREATER_THAN_EQUAL_TOKEN Expression {}
-           | Expression LESS_THAN_TOKEN Expression {}
-           | Expression GREATER_THAN_TOKEN Expression {}
+Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
+           | Expression AND_TOKEN Expression {$$ = new AndExpr($1,$3);}
+           | Expression EQUAL_TOKEN Expression {$$ = new EqualToExpr($1,$3);}
+           | Expression NOT_EQUAL_TOKEN Expression {$$ = new NotEqualToExpr($1,$3);}
+           | Expression LESS_THAN_EQUAL_TOKEN Expression {$$ = new LessThanEqualToExpr($1,$3);}
+           | Expression GREATER_THAN_EQUAL_TOKEN Expression {$$ = new GreaterThanEqualToExpr($1,$3);}
+           | Expression LESS_THAN_TOKEN Expression {$$ = new LessThanExpr($1,$3);}
+           | Expression GREATER_THAN_TOKEN Expression {$$ = new GreaterThanExpr($1,$3);}
            | Expression ADD_TOKEN Expression {$$ = new AddExpr($1,$3);}
-           | Expression SUB_TOKEN Expression {}
-           | Expression MULT_TOKEN Expression {}
-           | Expression DIV_TOKEN Expression {}
-           | Expression MOD_TOKEN Expression {}
-           | NOT_TOKEN Expression {}
-           | SUB_TOKEN Expression {}
-           | OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN  {}
+           | Expression SUB_TOKEN Expression {$$ = new SubExpr($1,$3);}
+           | Expression MULT_TOKEN Expression {$$ = new MultExpr($1,$3);}
+           | Expression DIV_TOKEN Expression {$$ = new DivExpr($1,$3);}
+           | Expression MOD_TOKEN Expression {$$ = new ModExpr($1,$3);}
+           | NOT_TOKEN Expression {$$ = new NotExpr($2);}
+           | SUB_TOKEN Expression {$$ = new NegationExpr($2);}
+           | OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN  {$$ = new ParenthesisExpr($2);}
            | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
            | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
            | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}

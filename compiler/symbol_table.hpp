@@ -24,15 +24,20 @@ class Variable
 {
 public:
   Variable() : is_const(false), type(""), gp_offset(0) {}
-  Variable(bool is_const, std::string type, int gp_offset) : is_const(is_const), type(type), gp_offset(gp_offset) {}
+  Variable(bool is_const, std::string type, int gp_offset, int value) : is_const(is_const), type(type), gp_offset(gp_offset), value(value) {}
   std::string getType() {return type;}
   bool isConst() {return is_const;}
   int getOffset() {return gp_offset;}
+  std::string getStringLabel() {return string_label;}
+  void setStringLabel(std::string s) {string_label = s;}
+  int getValue() {return value;}
 private:
   //std::string name;
   int gp_offset;
+  int value; //Only to be used if constant. 
   bool is_const;
   std::string type; 
+  std::string string_label;
 };
 
 class SymbolTable//Will also store local variables in here, but those will be offset from the frame pointer. 
@@ -51,6 +56,7 @@ public:
   int leaveScope();
   bool addStringLiteral(std::string name, std::string string);
   std::string getVariableAddress(std::string name);
+  bool addStringConstant(std::string id, std::string type, std::string string_value);
 private:
 	int line_number;
   //int current_scope;

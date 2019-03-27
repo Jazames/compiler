@@ -2,26 +2,27 @@
 
 trap "exit" INT
 
-DIRECTORY="OutputFromTest"
+OUTDIRECTORY="OutputFromTest"
+INDIRECTORY="TestFiles/simple_expressions/"
 
 #make a build directory if it doesn't exist. 
-if [ ! -d "$DIRECTORY" ]; then
-  # Control will enter here if $DIRECTORY doesn't exist.
-  mkdir $DIRECTORY
+if [ ! -d "$OUTDIRECTORY" ]; then
+  # Control will enter here if $OUTDIRECTORY doesn't exist.
+  mkdir $OUTDIRECTORY
 fi
 
 #Clean it out. 
-rm -rf $DIRECTORY/*
+rm -rf $OUTDIRECTORY/*
 
 
-for i in TestFiles/*.cpsl
+for i in $INDIRECTORY*.cpsl
 do
-  name="${i#*TestFiles/}";
+  name="${i#*$INDIRECTORY}";
   name="${name%%.cpsl}";
   #echo $name;
   echo "Testing $name";
-  ./build/cpsl < $i  > $DIRECTORY/$name.asm
-  java -jar Mars4_5.jar $DIRECTORY/$name.asm
+  ./build/cpsl < $i  > $OUTDIRECTORY/$name.asm
+  java -jar Mars4_5.jar $OUTDIRECTORY/$name.asm
   echo "";
   echo "";
 done

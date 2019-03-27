@@ -11,19 +11,20 @@
 class Register
 {
 public:
-	Register(char* inUse, int name) : inUse(inUse), name(name) {*inUse = 1;}
+	Register(char* inUse, int name, bool isSaved) : inUse(inUse), name(name), isSaved(isSaved) {*inUse = 1;}
 	~Register() {*inUse = 0;}
-	std::string getAsm() {return "$t" + std::to_string(name);}
-	void printAsm() {std::cout << "$t" << name;}
+	std::string getAsm();
+	void printAsm();
 private:
 	char* inUse;
 	const int name;
+	bool isSaved;
 };
 
 class RegisterPool
 {
 public:
-	Register getRegister();
+	Register* getRegister();
 	static RegisterPool& getInstance() {static RegisterPool instance; return instance;}
 	void print() {for(int i=0;i<register_pool.size();i++){std::cout << i << ":" << register_pool[i] << "\n";}}
 private:
@@ -31,7 +32,9 @@ private:
 	RegisterPool(int size);
 	~RegisterPool() {}
 	std::vector<char> register_pool;
+	std::vector<char> saved_register_pool;
 	const int pool_size;
+	const int saved_pool_size;
 };
 
 

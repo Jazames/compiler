@@ -74,5 +74,6 @@ private:
 
 //Functions:
 void addVarsToSymbolTable(IdentList* identList, Parse_Type* type);
+void addConstantToSymbolTable(std::string id, Expression* e);
 
 #endif

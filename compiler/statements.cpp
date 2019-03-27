@@ -8,19 +8,28 @@
 void Assignment::emit()
 {
   std::cout << "#Assignment Statement: \n"; //TODO: put what assignment this is. 
+  //Check if trying to assign to constant l-value
+  if(SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).isConst())
+  {
+    std::cerr << "Syntax Error: Attempting to assign to constant L-Value." << std::endl;
+    return;
+  }
+  //If the expression is constant, just load a literal. 
   if(e->isConst())
   {
     int value = e->getValue();
-    Register reg = RegisterPool::getInstance().getRegister();
+    Register* reg = RegisterPool::getInstance().getRegister();
     auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
-    std::cout << "li " << reg.getAsm() << ", " << value   << "      #Put constant expression into register\n";
-    std::cout << "sw " << reg.getAsm() << ", " << address << "      #Store value at address\n\n";
+    std::cout << "li " << reg->getAsm() << ", " << value   << "      #Put constant expression into register\n";
+    std::cout << "sw " << reg->getAsm() << ", " << address << "      #Store value at address\n\n";
+    delete(reg);
   }
   else 
   {
-    Register exprReg = e->emit();
+    Register* reg = e->emit();
     auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
-    std::cout << "sw " << exprReg.getAsm() << ", " << address << "      #Store value at address\n\n";
+    std::cout << "sw " << reg->getAsm() << ", " << address << "      #Store value at address\n\n";
+    delete(reg);
   }
 }
 
@@ -84,21 +93,24 @@ void Write::emit()
   {
     if(typeIsInt(expression_list[i]->getType()) || typeIsBool(expression_list[i]->getType())) 
     { 
-      Register reg = expression_list[i]->emit();
-      std::cout << "ori $a0, " << reg.getAsm() << ", 0\n";
+      Register* reg = expression_list[i]->emit();
+      std::cout << "ori $a0, " << reg->getAsm() << ", 0\n";
       std::cout << "li $v0, 1\nsyscall\n";
+      delete(reg);
     }
     else if(typeIsChar(expression_list[i]->getType()))
     {
-      Register reg = expression_list[i]->emit();
-      std::cout << "ori $a0, " << reg.getAsm() << ", 0\n";
+      Register* reg = expression_list[i]->emit();
+      std::cout << "ori $a0, " << reg->getAsm() << ", 0\n";
       std::cout << "li $v0, 11\nsyscall\n";
+      delete(reg);
     }
     else if(typeIsString(expression_list[i]->getType()))
     {
-      Register reg = expression_list[i]->emit();
-      std::cout << "ori $a0, " << reg.getAsm() << ", 0\n";
+      Register* reg = expression_list[i]->emit();
+      std::cout << "ori $a0, " << reg->getAsm() << ", 0\n";
       std::cout << "li $v0, 4\nsyscall\n";
+      delete(reg);
     }
     else
     {

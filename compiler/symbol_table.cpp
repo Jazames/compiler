@@ -1,4 +1,7 @@
 #include"symbol_table.hpp"
+#include"leaves.hpp"
+#include"expressions.hpp"
+#include"statements.hpp"
 
 #include<iostream>
 
@@ -20,18 +23,24 @@ bool SymbolTable::addVariable(std::string name, std::string type)
 
 bool SymbolTable::addVariableConstant(std::string name, std::string type, ConstValue value)
 {
-  Variable variable(true, type, current_global_offset);
+  Variable variable;
   if(variable_symbol_table.size() > 2)
   {
+    variable = Variable(true, type, current_local_offset, value);
     current_local_offset += retrieveTypeSymbol(type).getSize();
   }
   else
   {
+    variable = Variable(true, type, current_global_offset, value);
     current_global_offset += retrieveTypeSymbol(type).getSize();
   }
   variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
-  //TODO: assign value to area of memory. 
-    //Probably emit assembly to shove the value into the heap? 
+
+  Register* reg = RegisterPool::getInstance().getRegister();
+  std::string address = getVariableAddress(name);
+  std::cout << "li " << reg->getAsm() << ", " << value   << "      #Put constant value: " << value << " into register\n";
+  std::cout << "sw " << reg->getAsm() << ", " << address << "      #Store value at address of constant: " << name <<"\n\n";
+  delete(reg);
   return true;
 }
 
@@ -98,6 +107,29 @@ std::string SymbolTable::getVariableAddress(std::string name)
   {
     return std::to_string(variableAndScope.second.getOffset()) + "($fp)";
   }
+}
+
+
+bool SymbolTable::addStringConstant(std::string id, std::string type, std::string string_value)
+{
+  Variable variable;
+  if(variable_symbol_table.size() > 2)
+  {
+    variable = Variable(true, type, current_local_offset, 0);
+    current_local_offset += retrieveTypeSymbol(type).getSize();
+  }
+  else
+  {
+    variable = Variable(true, type, current_global_offset, 0);
+    current_global_offset += retrieveTypeSymbol(type).getSize();
+  }
+  std::string label = getNewStringLabel();
+  addStringLiteral(label, string_value);
+
+  variable.setStringLabel(label);
+  variable_symbol_table[variable_symbol_table.size()-1][id] = variable;
+
+  return true;
 }
 
 

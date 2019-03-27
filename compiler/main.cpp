@@ -10,8 +10,8 @@ int main()
 
   //Output header information.
   std::cout << "#Header\n";
-  std::cout << ".globl main\n" << ".text\n" << "main:\n\n";
-  //std::cout << "la $gp, GlobalArea\n"; //Perhaps this needs to be removed? 
+  std::cout << ".globl main\n" << ".text\n" << "main:\n";
+  std::cout << "la $gp, GlobalArea\n\n"; //Perhaps this needs to be removed? 
 
   //Setup Symbol Table. 
   SymbolTable& sym_tab = SymbolTable::getInstance();
@@ -52,5 +52,5 @@ int main()
   std::cout << "li $v0, 10\nsyscall\n\n";
   std::cout << ".data\n.align 4\n\n";
   sym_tab.emitLiterals();
-  std::cout << "GlobalArea:\n\n";
+  std::cout << ".align 4\nGlobalArea:\n\n";
 };

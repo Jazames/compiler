@@ -28,3 +28,25 @@ void addVarsToSymbolTable(IdentList* identList, Parse_Type* type)
 }
 
 
+
+void addConstantToSymbolTable(std::string id, Expression* e)
+{
+  if(e->isConst())
+  {
+    if(typeIsString(e->getType()))
+    {
+      LiteralExpr* le = dynamic_cast<LiteralExpr*>(e);
+      SymbolTable::getInstance().addStringConstant(id, "string", le->getStringValue());
+
+    }
+    else
+    {
+      SymbolTable::getInstance().addVariableConstant(id, e->getType(), e->getValue());
+    }
+  }
+  else
+  {
+    std::cerr << "Syntax Error: Cannot declare a constant with a non-constant expression." << std::endl;
+    exit(0);
+  }
+}

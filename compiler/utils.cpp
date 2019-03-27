@@ -11,15 +11,44 @@ int while_end_next_label;
 int string_next_label;
 
 
-RegisterPool::RegisterPool() : pool_size(10), register_pool()
+std::string Register::getAsm() 
+{
+	if(isSaved)
+	{
+		return "$s" + std::to_string(name);
+	}
+	else
+	{
+		return "$t" + std::to_string(name);
+	}
+}
+void Register::printAsm() 
+{
+	if(isSaved)
+	{
+		std::cout << "$s" << name;
+	}
+	else
+	{
+		std::cout << "$t" << name;
+	}
+}
+
+
+RegisterPool::RegisterPool() : pool_size(10), saved_pool_size(8), register_pool(), saved_register_pool()
 {
 	register_pool.reserve(pool_size);
 	for(int i = 0; i < pool_size; i++)
 	{
 		register_pool[i] = 0;
 	}
+	saved_register_pool.reserve(saved_pool_size);
+	for(int i = 0; i < saved_pool_size; i++)
+	{
+		saved_register_pool[i] = 0;
+	}
 }
-RegisterPool::RegisterPool(int size) : pool_size(size), register_pool()
+RegisterPool::RegisterPool(int size) : pool_size(size), saved_pool_size(8), register_pool(), saved_register_pool()
 {
 	register_pool.reserve(pool_size);
 	for(int i = 0; i < pool_size; i++)
@@ -28,17 +57,27 @@ RegisterPool::RegisterPool(int size) : pool_size(size), register_pool()
 	}
 }
 
-Register RegisterPool::getRegister()
+Register* RegisterPool::getRegister()
 {
 	for(int i = 0; i < pool_size; i++)
 	{
 		if(register_pool[i] == 0)
 		{
 			char* ptr = register_pool.data() + (i);
-			return Register(ptr, i);
+			return new Register(ptr, i, false); //Better not leak this!
 		}
 	}
+	for(int i = 0; i < saved_pool_size; i++)
+	{
+		if(saved_register_pool[i] == 0)
+		{
+			char* ptr = saved_register_pool.data() + (i);
+			return new Register(ptr, i, true); //Better not leak this!
+		}
+	}
+
 	std::cerr << "ERROR: Ran out of Registers." << std::endl;
+	exit(0);
 }
 
 //Helper Functions
