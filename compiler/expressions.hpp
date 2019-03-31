@@ -279,7 +279,7 @@ class LValueExpr : public Expression
 public:
   LValueExpr(LValue* lval) : Expression() , lval(lval){}
   Reg* emit() override; 
-  bool isConst() override {return SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).isConst();}
+  bool isConst() override {return false;}//SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).isConst();}
   Value getValue() override;
   std::string getType() override;
 private:

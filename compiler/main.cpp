@@ -2,6 +2,7 @@
 #include <string>
 #include "symbol_table.hpp"
 #include "utils.hpp"
+#include "types.hpp"
 
 extern int yyparse();
 
@@ -36,11 +37,11 @@ int main()
   sym_tab.addType("string", stringType);
   sym_tab.addType("STRING", stringType);
 
-  sym_tab.addVariableConstant("true", "boolean", 1);
-  sym_tab.addVariableConstant("TRUE", "boolean", 1);
+  sym_tab.addVariableConstant("true", boolType->getTypeID(), 1);
+  sym_tab.addVariableConstant("TRUE", boolType->getTypeID(), 1);
 
-  sym_tab.addVariableConstant("false", "boolean", 0);
-  sym_tab.addVariableConstant("FALSE", "boolean", 0);
+  sym_tab.addVariableConstant("false", boolType->getTypeID(), 0);
+  sym_tab.addVariableConstant("FALSE", boolType->getTypeID(), 0);
 
   //Get scope ready for global things
   sym_tab.enterScope();
@@ -53,4 +54,11 @@ int main()
   std::cout << ".data\n.align 4\n\n";
   sym_tab.emitLiterals();
   std::cout << ".align 4\nGlobalArea:\n\n";
+
+  delete(intType);
+  delete(charType);
+  delete(boolType);
+  delete(stringType);
+
+  exit(0);
 };

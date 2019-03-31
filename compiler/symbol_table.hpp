@@ -45,6 +45,7 @@ public:
   int leaveScope();
   bool addStringLiteral(std::string name, std::string string);
   std::string getVariableAddress(std::string name);
+  std::string getVariableAddressWithOffset(std::string name, int offset);
   bool addStringConstant(std::string id, std::string type, std::string string_value);
 private:
 	int line_number;

@@ -891,13 +891,9 @@ std::string OrdExpr::getType()
 }
 
 
-
-
-
-
 //Expressions with single value
 
-Register* LValueExpr::emit() 
+Register* LValueExpr::emit()//TODO: Change emit scheme based on lvalue type. 
 {
   if(typeIsString(getType()))
   {
@@ -907,7 +903,7 @@ Register* LValueExpr::emit()
     std::cout << "     # Load address of String literal into LVal\n";
     return reg;
   }
-  else
+  else if(typeIsArithmetic(getType()))
   {
     Register* reg = RegisterPool::getInstance().getRegister();
     std::cout << "lw " << reg->getAsm() << ", ";
@@ -970,7 +966,7 @@ Register* LiteralExpr::emit()
     std::cout << "la " << reg->getAsm() << ", " << label << "      # Put Address of String Literal: "<< s_val << " into register.\n";
     return reg;
   }
-  else //Should be good for integers, chars, and booleans. Maybe?
+  else if //Should be good for integers, chars, and booleans. Maybe?
   {
     Register* reg = RegisterPool::getInstance().getRegister();
     std::cout << "li " << reg->getAsm() << ", " << val << "      # Put Literal " << val << " into register.\n";

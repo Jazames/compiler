@@ -110,6 +110,19 @@ std::string SymbolTable::getVariableAddress(std::string name)
 }
 
 
+std::string SymbolTable::getVariableAddressWithOffset(std::string name, int offset)
+{
+  auto variableAndScope = retrieveVariableSymbolAndScope(name);
+  if(variableAndScope.first < 2) //That means it's global scope.
+  {
+    return std::to_string(variableAndScope.second.getOffset() + offset) + "($gp)";
+  }
+  else //Else it's local scope. 
+  {
+    return std::to_string(variableAndScope.second.getOffset() + offset) + "($fp)";
+  }
+}
+
 bool SymbolTable::addStringConstant(std::string id, std::string type, std::string string_value)
 {
   Variable variable;

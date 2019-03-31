@@ -40,10 +40,11 @@ private:
 
 
 //Useful Functions
-extern int while_begin_next_label; 
-extern int while_end_next_label; 
-extern int string_next_label;
+//extern int while_begin_next_label; 
+//extern int while_end_next_label; 
+//extern int string_next_label;
 
+std::string getLabelForAnon();
 std::string getNewWhileBeginLabel();// {return "whileBegin" + std::to_string(while_begin_next_label++);}
 std::string getNewWhileEndLabel();// {return "whileEnd" + std::to_string(while_end_next_label++);}
 std::string getNewStringLabel();// {return "nonCollidingStringLabel" + std::to_string(string_next_label++);}

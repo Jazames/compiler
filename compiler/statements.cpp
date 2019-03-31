@@ -14,14 +14,37 @@ void Assignment::emit()
     std::cerr << "Syntax Error: Attempting to assign to constant L-Value." << std::endl;
     return;
   }
+
+  //potential todo: check if types match. 
+  //If the lval size is greater than 4, then the expression is an lval. Or else there's a type mismatch. 
+  int size = SymbolTable::getInstance().retrieveTypeSymbol(lval->getType())->getSize();
+
   //If the expression is constant, just load a literal. 
-  if(e->isConst())
+  if(e->isConst() && size == 4)
   {
     int value = e->getValue();
     Register* reg = RegisterPool::getInstance().getRegister();
     auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
     std::cout << "li " << reg->getAsm() << ", " << value   << "      #Put constant expression into register\n";
     std::cout << "sw " << reg->getAsm() << ", " << address << "      #Store value at address\n\n";
+    delete(reg);
+  }
+  else if (size > 4)
+  {
+    LValue* rval = dynamic_cast<LValue*>(e);
+    if(rval == nullptr)
+    {
+      std::cerr << "Error, assignment between types of different sizes at line number ";
+      std::cerr << SymbolTable::getInstance().getLineNumber() << std::endl;
+    }
+    Register* reg = RegisterPool::getInstance().getRegister();
+    for(int i = 0; i < size; i+=4)
+    {
+      std::string laddress = SymbolTable::getInstance().getVariableAddressWithOffset(lval->getID(), i);
+      std::string raddress = SymbolTable::getInstance().getVariableAddressWithOffset(rval->getID(), i);
+      std::cout << "lw " << reg->getAsm() << ", " << raddress << "     # obtain word at address\n";
+      std::cout << "sw " << reg->getAsm() << ", " << laddress << "     # store word at address\n";
+    }
     delete(reg);
   }
   else 

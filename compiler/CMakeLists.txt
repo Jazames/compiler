@@ -27,6 +27,8 @@ set(cpsl_srcs
   statements.cpp
   leaves.hpp
   leaves.cpp
+  types.hpp
+  types.cpp
   ${BISON_Parser_OUTPUTS}
   ${FLEX_Scanner_OUTPUTS}
 )

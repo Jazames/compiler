@@ -4,6 +4,7 @@
 
 #include "symbol_table.hpp"
 #include "tree.hpp"
+#include "types.hpp"
 
 extern "C" int yylex(void);
 
@@ -150,7 +151,7 @@ RecordList : RecordList RecordLine {}
            ;
 RecordLine : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {}
            ;
-ArrayType : ARRAY_TOKEN OPEN_BRACKET_TOKEN Expression COLON_TOKEN Expression CLOSE_BRACKET_TOKEN OF_TOKEN Type {}
+ArrayType : ARRAY_TOKEN OPEN_BRACKET_TOKEN Expression COLON_TOKEN Expression CLOSE_BRACKET_TOKEN OF_TOKEN Type {$$ = new ArrayType($3, $5, $8);}
           ;
 IdentList : IDENTIFIER_TOKEN  {$$ = new IdentList($1);}
           | IDENTIFIER_TOKEN COMMA_TOKEN IdentList {$3->addIdent($1); $$ = $3;}
@@ -274,8 +275,8 @@ Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
            | Literal {$$ = $1;}
            ;
 
-LValue : IDENTIFIER_TOKEN {$$ = new LValue($1);}
-       | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {}
+LValue : IDENTIFIER_TOKEN {$$ = new IdentLValue($1);}
+       | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {$$ = new ArrayLValue($1, $3->getType());}
        | LValue DOT_TOKEN IDENTIFIER_TOKEN {}
        ;
 
