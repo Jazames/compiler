@@ -858,7 +858,7 @@ ChrExpr::ChrExpr(Expression* e) : Expression(), e(e)
 
 Register* ChrExpr::emit()
 {
-  e->emit();
+  return e->emit();
 }
 
 Value ChrExpr::getValue() 
@@ -878,17 +878,95 @@ OrdExpr::OrdExpr(Expression* e) : Expression(), e(e)
 
 Register* OrdExpr::emit()
 {
-  e->emit();
+  return e->emit();
 }
 
 Value OrdExpr::getValue() 
 {
-  e->getValue();
+  return e->getValue();
 } 
 
 std::string OrdExpr::getType()
 {
   return "integer";
+}
+
+
+
+Register* PredExpr::emit()
+{
+  Register* reg = e->emit();
+  if(typeIsBool(e->getType()))
+  {
+    std::cout << "xori " << reg->getAsm() << ", " << reg->getAsm() << ", 1     #Flip bit if boolean\n"; 
+    return reg;
+  }
+  else if(typeIsArithmetic(e->getType()))
+  {
+    std::cout << "addi " << reg->getAsm() << ", " << reg->getAsm() << ", -1     #Decrement the expression\n"; 
+    return reg;
+  }
+  else
+  {
+    std::cerr << "Error: Attempting to get the predecessor of a non-arithmetic expression." << std::endl;
+    exit(0);
+  }
+}
+
+Value PredExpr::getValue() 
+{
+  if(typeIsBool(e->getType()))
+  {
+    return e->getValue() ^ 0x01;
+  }
+  else
+  {
+    return e->getValue() - 1;
+  }
+} 
+
+std::string PredExpr::getType()
+{
+  return e->getType();
+}
+
+
+
+Register* SuccExpr::emit()
+{
+  Register* reg = e->emit();
+  if(typeIsBool(e->getType()))
+  {
+    std::cout << "xori " << reg->getAsm() << ", " << reg->getAsm() << ", 1     #Flip bit if boolean\n"; 
+    return reg;
+  }
+  else if(typeIsArithmetic(e->getType()))
+  {
+    std::cout << "addi " << reg->getAsm() << ", " << reg->getAsm() << ", 1     #Increment the expression\n"; 
+    return reg;
+  }
+  else
+  {
+    std::cerr << "Error: Attempting to get the successor of a non-arithmetic expression." << std::endl;
+    exit(0);
+  }
+}
+
+Value SuccExpr::getValue() 
+{
+  if(typeIsBool(e->getType()))
+  {
+    return e->getValue() ^ 0x01;
+  }
+  else
+  {
+    return e->getValue() + 1;
+  }
+} 
+
+std::string SuccExpr::getType()
+{
+  return e->getType();
 }
 
 
