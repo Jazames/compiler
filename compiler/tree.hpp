@@ -72,6 +72,27 @@ private:
 };
 
 
+class RecordLine {
+public:
+  RecordLine(IdentList* identList, Type* type) : identList(identList), type(type) {}
+  Type* getType() {return type;}
+  IdentList* getList() {return identList;}
+private:
+  IdentList* identList;
+  Type* type;
+};
+
+class RecordList {
+public:
+  RecordList() : recordLines() {}
+  void addRecordLine(RecordLine* line){recordLines.push_back(line);}
+  int getSize() {return recordLines.size();}
+  RecordLine* get(int pos) {return recordLines[pos];}
+private:
+  std::vector<RecordLine*> recordLines;
+};
+
+
 //Functions:
 void addVarsToSymbolTable(IdentList* identList, Type* type);
 void addConstantToSymbolTable(std::string id, Expression* e);

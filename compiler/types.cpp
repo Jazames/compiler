@@ -65,6 +65,61 @@ int ArrayType::getAddressOffsetOfElement(int position)
   return (position - lb) * SymbolTable::getInstance().retrieveTypeSymbol(baseType->getTypeID())->getSize();
 }
 
+// std::map<std::string, std::pair<int, type*> > memberList;
+
+RecordType::RecordType(RecordList* recordList) : Type(), type(getNameForAnon()), memberList()
+{
+  int offset = 0;
+  SymbolTable::getInstance().addType(type, this);
+
+  //Iterate through all of the member variables in this beautiful fashion. /s
+  for(int i = 0; i < recordList->getSize(); i++)
+  {
+    for(int j = 0; j < recordList->get(i)->getList()->getSize(); j++)
+    {
+      std::string name = recordList->get(i)->getList()->get(j);
+      Type* varType = recordList->get(i)->getType();
+      memberList[name] = std::pair<int, Type*>(offset, varType);
+      offset += varType->getSize();
+    }
+  }
+  //Offset should now be the size of the sum of all of the members. 
+  size = offset;
+}
+
+int RecordType::getSize()
+{
+  return size;
+}
+
+std::string RecordType::getTypeID()
+{
+  return type;
+}
+
+Type* RecordType::getTypeOfMember(std::string id)
+{
+  auto found = memberList.find(id);
+  if(found != memberList.end())
+  {
+    return found->second.second; //Get type from the pair. 
+  }
+  std::cerr << "Error: Could not find member " << id << " of type " << type;
+  std::cerr << " at line number " << SymbolTable::getInstance().getLineNumber() << std::endl;
+}
+
+int RecordType::getOffsetOfMember(std::string id)
+{  
+  auto found = memberList.find(id);
+  if(found != memberList.end())
+  {
+    return found->second.first; //Get offset from the pair. 
+  }
+  std::cerr << "Error: Could not find member " << id << " of type " << type;
+  std::cerr << " at line number " << SymbolTable::getInstance().getLineNumber() << std::endl;
+  return 0;
+}
+
 ////////////////////////////
 //LValues
 ////////////////////////////
@@ -240,4 +295,64 @@ std::string ArrayLValue::getType()
   Type* type_ptr = SymbolTable::getInstance().retrieveTypeSymbol(type_str);
   ArrayType* arr = dynamic_cast<ArrayType*>(type_ptr);
   return arr->getBaseType()->getTypeID();
+}
+
+
+
+//  LValue* lval;
+//  std::string ident
+RecordLValue::RecordLValue(LValue* lval, std::string ident) : LValue(), lval(lval), ident(ident)
+{
+  //Can be empty? 
+}
+
+Register* RecordLValue::emit()
+{
+  //return RegisterPool::getInstance().getRegister();
+  SymbolTable& sym_tab = SymbolTable::getInstance();
+
+  Type* type_ptr = sym_tab.retrieveTypeSymbol(lval->getType());
+  RecordType* rec = dynamic_cast<RecordType*>(type_ptr);
+  int offset = rec->getOffsetOfMember(ident);
+
+  Register* reg = RegisterPool::getInstance().getRegister();
+  Register* addrReg = lval->emitAddress();
+  std::cout << "lw " << reg->getAsm() << ", " << offset << "(" << addrReg->getAsm();
+  std::cout << ")     #Load Value from " << lval->getID() << "." << ident << "\n";
+
+  delete(addrReg);
+  return reg;
+}
+
+Register* RecordLValue::emitAddress()
+{   
+  SymbolTable& sym_tab = SymbolTable::getInstance();
+
+  Type* type_ptr = sym_tab.retrieveTypeSymbol(lval->getType());
+  RecordType* rec = dynamic_cast<RecordType*>(type_ptr);
+  int offset = rec->getOffsetOfMember(ident);
+
+  Register* reg = RegisterPool::getInstance().getRegister();
+  Register* addrReg = lval->emitAddress();
+  std::cout << "addi " << reg->getAsm() << ", " << addrReg->getAsm() << ", " << offset;
+  std::cout << "    #Load Address of " << lval->getID() << "." << ident << "\n";
+
+  delete(addrReg);
+  return reg;
+}
+
+std::string RecordLValue::getType()
+{
+  //std::cerr << "lval type: " << lval->getType() << " name: " << lval->getID() << std::endl;
+  Type* type_ptr = SymbolTable::getInstance().retrieveTypeSymbol(lval->getType());
+  RecordType* rec = dynamic_cast<RecordType*>(type_ptr);
+  //std::cerr << "ident: " << ident << std::endl;
+  type_ptr = rec->getTypeOfMember(ident);
+  //std::cerr << "type: " << type_ptr->getTypeID() << std::endl;
+  return type_ptr->getTypeID();
+}
+
+std::string RecordLValue::getID()
+{
+  return lval->getID(); //It's member lval is a reference to it's parent. 
 }

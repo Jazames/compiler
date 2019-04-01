@@ -39,7 +39,9 @@ void Assignment::emit()
     {
       std::cerr << "Error, assignment between types of different sizes at line number ";
       std::cerr << SymbolTable::getInstance().getLineNumber() << std::endl;
-      //std::cerr << "Left hand side type: " << lval->
+      std::cerr << "Left hand side type: " << lval->getType() << " size: " << size << std::endl;;
+      std::cerr << "Right hand side type: " << e->getType() << " size: ";
+      std::cerr << SymbolTable::getInstance().retrieveTypeSymbol(e->getType())->getSize() << std::endl;
       exit(0);
     }
 
@@ -156,7 +158,7 @@ void Write::emit()
     }
     else
     {
-      std::cerr << "Syntax Error, trying to print out a user-defined type." << std::endl;
+      std::cerr << "Syntax Error, trying to print out a user-defined type: " << expression_list[i]->getType() << std::endl;
     }
   }
   std::cout << "\n";

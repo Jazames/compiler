@@ -947,11 +947,11 @@ std::string LValueExpr::getType()
   RecordLValue* rec = dynamic_cast<RecordLValue*>(lval);
   if(arr != nullptr)
   {
-    return arr->getBaseType();
+    return arr->getType();
   }
   else if(rec != nullptr)
   {
-    return "";//rec->getMemberType()
+    return rec->getType();
   }
   else
   {

@@ -24,6 +24,8 @@ IdentList* ident_list;
 Type* p_type;
 Read* read_stmt;
 Assignment* assign_stmt;
+RecordLine* record_line;
+RecordList* record_list;
 }
 
 %token ARRAY_TOKEN
@@ -108,6 +110,8 @@ Assignment* assign_stmt;
 %type <p_type> RecordType
 %type <read_stmt> ReadStatement
 %type <assign_stmt> Assignment
+%type <record_line> RecordLine
+%type <record_list> RecordList
 
 %left OR_TOKEN
 %left AND_TOKEN
@@ -145,11 +149,11 @@ Type : SimpleType {$$ = $1;}
      ;
 SimpleType : IDENTIFIER_TOKEN {$$ = new SimpleType($1);}
            ;
-RecordType : RECORD_TOKEN RecordList END_TOKEN {}
-RecordList : RecordList RecordLine {}
-           | {} 
+RecordType : RECORD_TOKEN RecordList END_TOKEN {$$ = new RecordType($2);}
+RecordList : RecordList RecordLine {$1->addRecordLine($2); $$ = $1;}
+           | {$$ = new RecordList();} 
            ;
-RecordLine : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {}
+RecordLine : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {$$ = new RecordLine($1, $3);}
            ;
 ArrayType : ARRAY_TOKEN OPEN_BRACKET_TOKEN Expression COLON_TOKEN Expression CLOSE_BRACKET_TOKEN OF_TOKEN Type {$$ = new ArrayType($3, $5, $8);}
           ;
@@ -277,7 +281,7 @@ Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
 
 LValue : IDENTIFIER_TOKEN {$$ = new IdentLValue($1);}
        | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {$$ = new ArrayLValue($1, $3);}
-       | LValue DOT_TOKEN IDENTIFIER_TOKEN {}
+       | LValue DOT_TOKEN IDENTIFIER_TOKEN {$$ = new RecordLValue($1, $3);}
        ;
 
 
