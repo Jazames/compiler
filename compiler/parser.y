@@ -276,7 +276,7 @@ Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
            ;
 
 LValue : IDENTIFIER_TOKEN {$$ = new IdentLValue($1);}
-       | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {$$ = new ArrayLValue($1, $3->getType());}
+       | LValue OPEN_BRACKET_TOKEN Expression CLOSE_BRACKET_TOKEN {$$ = new ArrayLValue($1, $3);}
        | LValue DOT_TOKEN IDENTIFIER_TOKEN {}
        ;
 

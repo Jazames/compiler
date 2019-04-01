@@ -18,10 +18,10 @@ int main()
   SymbolTable& sym_tab = SymbolTable::getInstance();
   //Get scope ready for predefined things
   sym_tab.enterScope();
-  SimpleType* intType    = new SimpleType("integer");
-  SimpleType* charType   = new SimpleType("char");   
-  SimpleType* boolType   = new SimpleType("boolean");
-  SimpleType* stringType = new SimpleType("string"); 
+  SimpleType* intType    = new SimpleType("integer", 4);
+  SimpleType* charType   = new SimpleType("char", 4);   
+  SimpleType* boolType   = new SimpleType("boolean", 4);
+  SimpleType* stringType = new SimpleType("string", 4); 
 
   sym_tab.addType("integer", intType);
   sym_tab.addType("INTEGER", intType);
@@ -29,19 +29,20 @@ int main()
   sym_tab.addType("char", charType);
   sym_tab.addType("CHAR", charType);
 
-
   sym_tab.addType("boolean", boolType);
   sym_tab.addType("BOOLEAN", boolType);
-
 
   sym_tab.addType("string", stringType);
   sym_tab.addType("STRING", stringType);
 
-  sym_tab.addVariableConstant("true", boolType->getTypeID(), 1);
-  sym_tab.addVariableConstant("TRUE", boolType->getTypeID(), 1);
 
-  sym_tab.addVariableConstant("false", boolType->getTypeID(), 0);
-  sym_tab.addVariableConstant("FALSE", boolType->getTypeID(), 0);
+  //std::cerr << "About to add constants. " << std::endl;
+
+  sym_tab.addVariableConstant("true", "boolean", 1);
+  sym_tab.addVariableConstant("TRUE", "boolean", 1);
+
+  sym_tab.addVariableConstant("false", "boolean", 0);
+  sym_tab.addVariableConstant("FALSE", "boolean", 0);
 
   //Get scope ready for global things
   sym_tab.enterScope();

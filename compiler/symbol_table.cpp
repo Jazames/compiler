@@ -51,6 +51,7 @@ Variable SymbolTable::retrieveVariableSymbol(std::string id)
 
 bool SymbolTable::addType(std::string name, Type* type)
 {
+  //std::cerr << "adding type: " << name << std::endl;
   type_symbol_table[type_symbol_table.size()-1][name] = type;
 }
 
@@ -106,6 +107,19 @@ std::string SymbolTable::getVariableAddress(std::string name)
   else //Else it's local scope. 
   {
     return std::to_string(variableAndScope.second.getOffset()) + "($fp)";
+  }
+}
+
+std::pair<int, std::string> SymbolTable::getVariableOffsetAndBase(std::string name)
+{
+  auto variableAndScope = retrieveVariableSymbolAndScope(name);
+  if(variableAndScope.first < 2) //That means it's global scope.
+  {
+    return std::pair<int, std::string>(variableAndScope.second.getOffset(), "$gp");
+  }
+  else //Else it's local scope. 
+  {
+    return std::pair<int, std::string>(variableAndScope.second.getOffset(), "$fp");
   }
 }
 

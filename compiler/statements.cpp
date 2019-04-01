@@ -24,35 +24,54 @@ void Assignment::emit()
   {
     int value = e->getValue();
     Register* reg = RegisterPool::getInstance().getRegister();
-    auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
+    //auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
+    Register* addressReg = lval->emitAddress();
     std::cout << "li " << reg->getAsm() << ", " << value   << "      #Put constant expression into register\n";
-    std::cout << "sw " << reg->getAsm() << ", " << address << "      #Store value at address\n\n";
+    std::cout << "sw " << reg->getAsm() << ", (" << addressReg->getAsm() << ")      #Store value at address\n\n";
     delete(reg);
+    delete(addressReg);
   }
   else if (size > 4)
   {
-    LValue* rval = dynamic_cast<LValue*>(e);
+    //std::cerr << "Size is " << size << std::endl;
+    LValueExpr* rval = dynamic_cast<LValueExpr*>(e);
     if(rval == nullptr)
     {
       std::cerr << "Error, assignment between types of different sizes at line number ";
       std::cerr << SymbolTable::getInstance().getLineNumber() << std::endl;
+      //std::cerr << "Left hand side type: " << lval->
+      exit(0);
     }
+
     Register* reg = RegisterPool::getInstance().getRegister();
+    Register* lreg = lval->emitAddress();
+    Register* rreg = rval->getLValue()->emitAddress();
     for(int i = 0; i < size; i+=4)
     {
-      std::string laddress = SymbolTable::getInstance().getVariableAddressWithOffset(lval->getID(), i);
-      std::string raddress = SymbolTable::getInstance().getVariableAddressWithOffset(rval->getID(), i);
-      std::cout << "lw " << reg->getAsm() << ", " << raddress << "     # obtain word at address\n";
-      std::cout << "sw " << reg->getAsm() << ", " << laddress << "     # store word at address\n";
+      //std::string laddress = SymbolTable::getInstance().getVariableAddressWithOffset(lval->getID(), i);
+      //std::string raddress = SymbolTable::getInstance().getVariableAddressWithOffset(rval->getID(), i);
+
+      //std::cout << "lw " << reg->getAsm() << ", " << raddress << "     # obtain word at address\n";
+      //std::cout << "sw " << reg->getAsm() << ", " << laddress << "     # store word at address\n";
+
+      std::cout << "lw " << reg->getAsm() << ", " << i << "(" << rreg->getAsm() << ")     # obtain word at address\n";
+      std::cout << "sw " << reg->getAsm() << ", " << i << "(" << lreg->getAsm() << ")     # store word at address\n";
+
     }
     delete(reg);
+    delete(lreg);
+    delete(rreg);
+    std::cout << std::endl;
   }
   else 
   {
+    std::cout << "# Doing an other type of assignment.\n";
     Register* reg = e->emit();
-    auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
-    std::cout << "sw " << reg->getAsm() << ", " << address << "      #Store value at address\n\n";
+    //auto address = SymbolTable::getInstance().getVariableAddress(lval->getID());
+    Register* addressReg = lval->emitAddress();
+    std::cout << "sw " << reg->getAsm() << ", (" << addressReg->getAsm() << ")      #Store value at address\n\n";
     delete(reg);
+    delete(addressReg);
   }
 }
 

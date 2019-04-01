@@ -17,7 +17,7 @@
 void addVarsToSymbolTable(IdentList* identList, Type* type)
 {
 	SymbolTable& sym_tab = SymbolTable::getInstance();
-	std::string typeID = type->getTypeID();
+	std::string typeID = type->getTypeID(); //sym_tab.retrieveTypeSymbol(type->getTypeID())->getTypeID();//type->getTypeID();
 	for(int i = 0; i < identList->getSize(); i++)
 	{
 		sym_tab.addVariable(identList->get(i), typeID);

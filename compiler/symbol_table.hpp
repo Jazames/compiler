@@ -37,6 +37,7 @@ public:
 	int getLineNumber() {return line_number;}
   void emitLiterals();
   bool addType(std::string name, Type* type);
+  //bool addPredefinedType(std::string name, )
   bool addVariable(std::string name, std::string type);
   bool addVariableConstant(std::string name, std::string type, ConstValue value);
   Variable retrieveVariableSymbol(std::string name);
@@ -47,6 +48,7 @@ public:
   std::string getVariableAddress(std::string name);
   std::string getVariableAddressWithOffset(std::string name, int offset);
   bool addStringConstant(std::string id, std::string type, std::string string_value);
+  std::pair<int, std::string> getVariableOffsetAndBase(std::string name);
 private:
 	int line_number;
   //int current_scope;

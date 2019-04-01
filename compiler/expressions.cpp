@@ -1,5 +1,6 @@
 #include "expressions.hpp"
 
+#include "types.hpp"
 
 //Expression Member Functions
 
@@ -895,6 +896,19 @@ std::string OrdExpr::getType()
 
 Register* LValueExpr::emit()//TODO: Change emit scheme based on lvalue type. 
 {
+  Register* reg = lval->emit();
+  return reg;
+
+  /*
+  //Possibly useless stuff. 
+  ArrayLValue*  arr = dynamic_cast<ArrayLValue* >(lval);
+  RecordLValue* rec = dynamic_cast<RecordLValue*>(lval);
+
+  if(arr != nullptr) //Check if lval is of Array type.
+  {
+    //arr->
+  }
+
   if(typeIsString(getType()))
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -908,9 +922,10 @@ Register* LValueExpr::emit()//TODO: Change emit scheme based on lvalue type.
     Register* reg = RegisterPool::getInstance().getRegister();
     std::cout << "lw " << reg->getAsm() << ", ";
     std::cout << SymbolTable::getInstance().getVariableAddress(lval->getID());
-    std::cout << "    #Load LVal: " << lval->getID() << " into register.\n";
+    std::cout << "     #Load LVal: " << lval->getID() << " into register.\n";
     return reg;
   }
+  */
 }
 
 Value LValueExpr::getValue() 
@@ -928,9 +943,22 @@ Value LValueExpr::getValue()
 
 std::string LValueExpr::getType()
 {
-  std::string type = SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).getType();
-  auto ptr = SymbolTable::getInstance().retrieveTypeSymbol(type);
-  return ptr->getTypeID();
+  ArrayLValue*  arr = dynamic_cast<ArrayLValue* >(lval);
+  RecordLValue* rec = dynamic_cast<RecordLValue*>(lval);
+  if(arr != nullptr)
+  {
+    return arr->getBaseType();
+  }
+  else if(rec != nullptr)
+  {
+    return "";//rec->getMemberType()
+  }
+  else
+  {
+    std::string type = SymbolTable::getInstance().retrieveVariableSymbol(lval->getID()).getType();
+    auto ptr = SymbolTable::getInstance().retrieveTypeSymbol(type);
+    return ptr->getTypeID();
+  }
 }
 
 LiteralExpr::LiteralExpr(Value val, std::string type) : Expression(), val(val), type(type) 
@@ -966,7 +994,7 @@ Register* LiteralExpr::emit()
     std::cout << "la " << reg->getAsm() << ", " << label << "      # Put Address of String Literal: "<< s_val << " into register.\n";
     return reg;
   }
-  else if //Should be good for integers, chars, and booleans. Maybe?
+  else  //Should be good for integers, chars, and booleans. Maybe?
   {
     Register* reg = RegisterPool::getInstance().getRegister();
     std::cout << "li " << reg->getAsm() << ", " << val << "      # Put Literal " << val << " into register.\n";
