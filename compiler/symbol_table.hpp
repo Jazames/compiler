@@ -49,6 +49,7 @@ public:
   std::string getVariableAddressWithOffset(std::string name, int offset);
   bool addStringConstant(std::string id, std::string type, std::string string_value);
   std::pair<int, std::string> getVariableOffsetAndBase(std::string name);
+  bool doesVariableExist(std::string id);
 private:
 	int line_number;
   //int current_scope;

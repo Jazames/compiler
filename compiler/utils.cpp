@@ -6,11 +6,19 @@ static int fake_name;
 static int while_begin_next_label; 
 static int while_end_next_label; 
 static int string_next_label;
+static int if_end_next_label;
+static int else_if_next_label;
+static int repeat_next_lablel;
+static int for_next_label;
 
 std::string getNameForAnon() {return "_fakeName" + std::to_string(fake_name++);}
 std::string getNewWhileBeginLabel() {return "_whileBegin" + std::to_string(while_begin_next_label++);}
 std::string getNewWhileEndLabel() {return "_whileEnd" + std::to_string(while_end_next_label++);}
 std::string getNewStringLabel() {return "_nonCollidingStringLabel" + std::to_string(string_next_label++);}
+std::string getNewIfEndLabel() {return "_IfEndLabel" + std::to_string(if_end_next_label++);}
+std::string getNewElseIfLabel() {return "_ElseIfLabel" + std::to_string(else_if_next_label++);}
+std::string getNewRepeatLabel() {return "_RepeatLabel" + std::to_string(repeat_next_lablel++);}
+std::string getNewForLabel() {return "_ForLabel" + std::to_string(for_next_label++);}
 
 
 

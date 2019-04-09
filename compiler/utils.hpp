@@ -48,6 +48,10 @@ std::string getNameForAnon();
 std::string getNewWhileBeginLabel();// {return "whileBegin" + std::to_string(while_begin_next_label++);}
 std::string getNewWhileEndLabel();// {return "whileEnd" + std::to_string(while_end_next_label++);}
 std::string getNewStringLabel();// {return "nonCollidingStringLabel" + std::to_string(string_next_label++);}
+std::string getNewIfEndLabel();
+std::string getNewElseIfLabel();
+std::string getNewRepeatLabel();
+std::string getNewForLabel();
 
 //Helper Functions
 char charStringToChar(std::string s_val);

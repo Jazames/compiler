@@ -159,6 +159,20 @@ bool SymbolTable::addStringConstant(std::string id, std::string type, std::strin
   return true;
 }
 
+bool SymbolTable::doesVariableExist(std::string id)
+{
+  int scope = variable_symbol_table.size() - 1;
+  for(auto iter = variable_symbol_table.rbegin(); iter != variable_symbol_table.rend(); ++iter)
+  {
+    auto found = iter->find(id);
+    if(found != iter->end()) 
+    {
+      return true;
+    }
+    scope--;
+  }
+  return false;
+}
 
 std::pair<int,Variable> SymbolTable::retrieveVariableSymbolAndScope(std::string id)
 {

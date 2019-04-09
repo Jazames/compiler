@@ -16,11 +16,17 @@ beq expr, 0, whileEnd; //This label needs to be unique, so probably keep track o
 |
 | Statement List
 |
-j whileBegin
+j whileBegins
 whileEnd
 
 
 
+RepeatStatement --> repeat StatmentList until Expression
+
+RepeatBegin
+| statements 
+| Expression
+if false branch RepeatBegin
 
 //If Statement
 
@@ -48,7 +54,16 @@ nextElseIf2
 ifEnd
 
 //For loop:
-follow while statement. 
+
+Id = startE
+
+startForLabel
+| statements
+
+increment/decrement Id
+| endE
+if Id <=/>= endE branch startForLabel
+
 
 
 

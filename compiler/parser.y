@@ -17,15 +17,19 @@ int val;
 char* id;
 Expression* expr;
 ExpressionList* expr_list;
-Write* write_stmt;
+Statement* stmt;
+//Write* write_stmt;
 LValue* lval;
 LValueList* lval_list;
 IdentList* ident_list;
 Type* p_type;
-Read* read_stmt;
-Assignment* assign_stmt;
+//Read* read_stmt;
+//Assignment* assign_stmt;
 RecordLine* record_line;
 RecordList* record_list;
+StatementSequence* stmt_sequence;
+ElseIfSequence* elsif_sequence;
+ElseSequence* else_sequence;
 }
 
 %token ARRAY_TOKEN
@@ -95,7 +99,6 @@ RecordList* record_list;
 %type <expr> Expression
 %type <id> IDENTIFIER_TOKEN
 %type <expr_list> ExpressionList
-%type <write_stmt> WriteStatement
 %type <id> CHAR_LITERAL_TOKEN
 %type <val> DECIMAL_LITERAL_TOKEN
 %type <val> HEX_LITERAL_TOKEN
@@ -108,10 +111,24 @@ RecordList* record_list;
 %type <p_type> SimpleType
 %type <p_type> ArrayType
 %type <p_type> RecordType
-%type <read_stmt> ReadStatement
-%type <assign_stmt> Assignment
 %type <record_line> RecordLine
 %type <record_list> RecordList
+%type <stmt_sequence> StatementSequence
+%type <stmt> Statement
+%type <stmt> Assignment
+%type <stmt> IfStatement
+%type <stmt> WhileStatement
+%type <stmt> RepeatStatement
+%type <stmt> ForStatement
+%type <stmt> StopStatement
+%type <stmt> ReturnStatement
+%type <stmt> ReadStatement
+%type <stmt> WriteStatement
+%type <stmt> ProcedureCall
+%type <stmt> NullStatement
+%type <elsif_sequence> ElseIfSequence
+%type <else_sequence> ElseSequence
+
 
 %left OR_TOKEN
 %left AND_TOKEN
@@ -196,11 +213,11 @@ VarOrRef : VAR_TOKEN {}
          ;
 Body : ConstantDeclSection TypeDeclSection VarDeclSection Block {}
      ;
-Block : BEGIN_TOKEN StatementSequence END_TOKEN {}
+Block : BEGIN_TOKEN StatementSequence END_TOKEN {$2->emit();}
       ;
 
-StatementSequence : Statement {}
-                  | Statement SEMICOLON_TOKEN StatementSequence {}
+StatementSequence : Statement {$$ = new StatementSequence($1);}
+                  | Statement SEMICOLON_TOKEN StatementSequence {$$ = $3; $$->addStatement($1);}
                   ;
 
 Statement : Assignment {}
@@ -215,34 +232,34 @@ Statement : Assignment {}
           | ProcedureCall {}
           | NullStatement {}
           ;
-Assignment : LValue ASSIGNMENT_TOKEN Expression {$$ = new Assignment($1, $3); $$->emit();}
+Assignment : LValue ASSIGNMENT_TOKEN Expression {$$ = new Assignment($1, $3);}
            ;
-IfStatement : IF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence ElseSequence END_TOKEN {}
+IfStatement : IF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence ElseSequence END_TOKEN {$$ = new If($2, $4, $5, $6);}
             ;
-ElseIfSequence : ELSEIF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence {}
-               | {}
+ElseIfSequence : ELSEIF_TOKEN Expression THEN_TOKEN StatementSequence ElseIfSequence {$$ = $5; $$->addElseIf($2, $4);}
+               | {$$ = new ElseIfSequence();}
                ;
-ElseSequence : ELSE_TOKEN StatementSequence {}
-             | {}
+ElseSequence : ELSE_TOKEN StatementSequence {$$ = new ElseSequence($2);}
+             | {$$ = new ElseSequence();}
              ;
-WhileStatement : WHILE_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {}
+WhileStatement : WHILE_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {$$ = new While($2, $4);}
                ;
-RepeatStatement : REPEAT_TOKEN StatementSequence UNTIL_TOKEN Expression {}
+RepeatStatement : REPEAT_TOKEN StatementSequence UNTIL_TOKEN Expression {$$ = new Repeat($4, $2);}
                 ;
-ForStatement : FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression TO_TOKEN     Expression DO_TOKEN StatementSequence END_TOKEN {}
-             | FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression DOWNTO_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {}
+ForStatement : FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression TO_TOKEN     Expression DO_TOKEN StatementSequence END_TOKEN {$$ = new For($2, $4, false, $6, $8);}
+             | FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression DOWNTO_TOKEN Expression DO_TOKEN StatementSequence END_TOKEN {$$ = new For($2, $4, true,  $6, $8);}
              ;
-StopStatement : STOP_TOKEN {std::cout << "#terminate program\n";std::cout << "li $v0, 10\nsyscall\n\n";}
+StopStatement : STOP_TOKEN {$$ = new Stop();}
               ;
 ReturnStatement : RETURN_TOKEN Expression {}
                 | RETURN_TOKEN {}
                 ;
-ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {$$ = new Read($3); $$->emit();}
+ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {$$ = new Read($3);}
               ;
 LValueList : LValue {$$ = new LValueList($1);}
            | LValue COMMA_TOKEN LValueList {$3->addLValue($1); $$ = $3;}
            ;
-WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {$$ = new Write($3); $$->emit();}
+WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {$$ = new Write($3);}
                ;
 ExpressionList : Expression {$$ = new ExpressionList($1);}
                | Expression COMMA_TOKEN ExpressionList {$3->addExpression($1); $$ = $3;}
@@ -250,7 +267,7 @@ ExpressionList : Expression {$$ = new ExpressionList($1);}
 ProcedureCall : IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
               | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
               ;
-NullStatement : {}
+NullStatement : {$$ = new Null();}
               ;
 
 Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
@@ -273,8 +290,8 @@ Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
            | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
            | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new ChrExpr($3);}
            | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new OrdExpr($3);}
-           | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
-           | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {}
+           | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new PredExpr($3);}
+           | SUCC_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new SuccExpr($3);}
            | LValue {$$ = new LValueExpr($1);}
            | Literal {$$ = $1;}
            ;

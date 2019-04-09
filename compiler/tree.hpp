@@ -61,7 +61,8 @@ public:
 
 
 
-class IdentList {
+class IdentList 
+{
 public:
   IdentList(std::string id) : id_list() {id_list.push_back(id);}
   std::string get(int i){return id_list[i];}
@@ -72,7 +73,8 @@ private:
 };
 
 
-class RecordLine {
+class RecordLine 
+{
 public:
   RecordLine(IdentList* identList, Type* type) : identList(identList), type(type) {}
   Type* getType() {return type;}
@@ -82,7 +84,8 @@ private:
   Type* type;
 };
 
-class RecordList {
+class RecordList 
+{
 public:
   RecordList() : recordLines() {}
   void addRecordLine(RecordLine* line){recordLines.push_back(line);}

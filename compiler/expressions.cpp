@@ -1059,8 +1059,6 @@ LiteralExpr::LiteralExpr(std::string value, std::string type) : Expression(), va
   }
 }
 
-
-
 Register* LiteralExpr::emit()
 {
   if (typeIsString(type)) 
@@ -1089,7 +1087,3 @@ std::string LiteralExpr::getType()
 {
   return type;
 }
-
-
-
-//Functions

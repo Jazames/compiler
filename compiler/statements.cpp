@@ -1,5 +1,31 @@
 #include "statements.hpp"
+#include "types.hpp"
 
+
+
+//Statement Helper Member Functions
+
+void StatementSequence::emit() 
+{
+  //Need to emit in reverse order, because statements are added last to first. 
+//  std::cerr << "Emitting statements in block. Size = " << list.size() << std::endl;
+  for(int i = list.size() - 1; i >= 0; i--)
+  {
+    if(list[i] != nullptr)
+    {
+      list[i]->emit();
+    }
+    else
+    {
+      std::cerr << "Statement is null. i=" << i << " listSize=" << list.size() << std::endl;
+    }
+  }
+}
+
+ElseSequence::ElseSequence() : ss(new StatementSequence(new Null()))  //Put a statement in there that doesn't do anything. It's safe to put these everywhere. 
+{
+
+}
 
 
 
@@ -75,6 +101,194 @@ void Assignment::emit()
     delete(reg);
     delete(addressReg);
   }
+}
+
+/*
+  Expression* e;
+  StatementSequence* list;
+  ElseIfSequence* eifs;
+  ElseSequence* els;
+*/
+void If::emit() 
+{
+  std::cout << "#If Statement\n";
+  std::string end_label = getNewIfEndLabel();
+  
+  //Check condition.
+  Register* reg = e->emit();
+  std::string else_if_label = getNewElseIfLabel();
+  std::cout << "beq " << reg->getAsm() << ", $zero, "  << else_if_label << "   #     \n";
+  delete(reg);
+
+  //Now output commands in if block. 
+  list->emit();
+  std::cout << "j " << end_label << " #Go to end of if statement\n\n";
+
+
+  std::cout << else_if_label << ": # Start of next condition\n";
+  //Need to get these backwards because of how the thingaling works. 
+  for(int i = eifs->getSize() - 1; i >= 0; i--)
+  {
+    Expression* eif_e = eifs->getExpr(i);
+    StatementSequence* eif_ss = eifs->getSS(i);
+    
+    //Check condition
+    Register* ereg = eif_e->emit();
+    else_if_label = getNewElseIfLabel();
+    std::cout << "beq " << ereg->getAsm() << ", $zero, " << else_if_label << "   #   \n";
+    delete(ereg);
+
+    //Now throw out statements. 
+    eif_ss->emit();
+    std::cout << "j " << end_label << " #Go to end of if statement\n\n";
+
+    //Setup for next condition
+    std::cout << else_if_label << ": # Start of next condition\n";
+  }
+
+  //Now take care of else. 
+  //Label is already output. 
+  els->emitSS();
+
+  //Throw down end label. 
+  std::cout << end_label << ": #   End of If Statement\n\n";
+}
+
+/* Members
+Expression* e
+StatementSequence* ss
+*/
+void While::emit()
+{
+  std::cout << "#While Statment\n";
+  std::string begin_label = getNewWhileBeginLabel();
+  std::string end_label = getNewWhileEndLabel();
+
+  //Place begin label
+  std::cout << begin_label << ":    #Start of while loop\n";
+
+  //Place expression
+  Register* reg = e->emit();
+
+  //Check condition, end if unmet.
+  std::cout << "beq " << reg->getAsm() << ", $zero, " << end_label << "   #Exit loop.\n";
+  delete(reg);
+
+  //Place statement sequence. 
+  ss->emit();
+
+  //Jump back to beginning. 
+  std::cout << "j " << begin_label << "    # Repeat the loop\n";
+  //Place end label. 
+  std::cout << end_label << ":     #End of while loop\n";
+}
+/* Members
+Expression* e
+StatementSequence* ss
+*/
+
+void Repeat::emit()
+{
+  std::cout << "#Repeat Statment\n";
+  std::string repeat_label = getNewRepeatLabel();
+
+  //Place begin label
+  std::cout << repeat_label << ":    #Start of repeat loop\n";
+
+  //Place statement sequence. 
+  ss->emit();
+
+  //Place expression
+  Register* reg = e->emit();
+
+  //Check condition, end if unmet.
+  std::cout << "beq " << reg->getAsm() << ", $zero, " << repeat_label << "   #Exit loop if condition is met.\n\n";
+  delete(reg);
+}
+
+/* Members
+  bool downto;
+  StatementSequence* ss;
+  Expression* startE;
+  Expression* endE;
+  std::string id;
+
+//Function: 
+Id = startE
+
+startForLabel
+| statements
+
+increment/decrement Id
+| endE
+if Id <=/>= endE branch startForLabel
+*/
+void For::emit()
+{
+  std::cout << "# For Statement\n";
+  //Add variable. 
+  SymbolTable& sym_tab = SymbolTable::getInstance();
+
+  if(!sym_tab.doesVariableExist(id))
+  {
+    sym_tab.addVariable(id, startE->getType());
+  }
+  LValue* lval = new IdentLValue(id);
+  Expression* expr = new LValueExpr(lval);
+
+  Assignment ass(lval, startE);
+  ass.emit();
+
+  //Throw out label. 
+  std::string for_label = getNewForLabel();
+  std::cout << for_label << ":      # Start of For Loop\n";
+
+  //Throw out statements;
+  ss->emit();
+
+  //Increment/decrement Id
+  if(downto)
+  { //decrement case
+    PredExpr Predy(expr);
+    Assignment new_ass(lval, &Predy);
+    new_ass.emit();
+  }
+  else
+  { //increment case
+    SuccExpr Succy(expr);
+    Assignment new_ass(lval, &Succy);
+    new_ass.emit();
+  }
+
+  //Throw out End Expression
+  //Register* regEnd = endE->emit();
+  //Register* regId  = expr->emit();
+
+  //Check if should repeat. 
+  if(downto)
+  {
+    //if regID < regEnd, then be done. 
+    LessThanExpr lesso(expr, endE);
+    Register* reg = lesso.emit();
+    std::cout << "beq " << reg->getAsm() << ", $zero, " << for_label << "     # repeat for loop if finished check isn't true.\n\n";
+    delete(reg);
+    //std::cout << "bne " << regEnd->getAsm() << ", " << regId->getAsm() << ", " << for_label << "   # repeat for loop if not equal yet\n\n";
+  }
+  else
+  {
+    //if regID > regEnd, then be done. 
+    GreaterThanExpr greato(expr, endE);
+    Register* reg = greato.emit();
+    std::cout << "beq " << reg->getAsm() << ", $zero, " << for_label << "     # repeat for loop if finished check isn't true.\n\n";
+    delete(reg);
+    //std::cout << "bne " << regEnd->getAsm() << ", " << regId->getAsm() << ", " << for_label << "   # repeat for loop if not equal yet\n\n";
+  }
+  
+  //Clean up. 
+  //delete(regEnd);
+  //delete(regId);
+  delete(expr);
+  delete(lval);
 }
 
 Read::Read(LValueList* lvl)
