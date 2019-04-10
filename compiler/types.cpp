@@ -36,6 +36,13 @@ SimpleType::SimpleType(std::string id)
 
 }
 
+int SimpleType::getSize(){
+  if(size == -1){
+    std::cerr << "ID: " << id << std::endl;
+    return SymbolTable::getInstance().retrieveTypeSymbol(id)->getSize();
+  }
+  return size;
+}
 //Array type
 
 //member variables

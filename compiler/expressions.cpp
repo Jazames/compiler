@@ -9,16 +9,16 @@
 
 OrExpr::OrExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* OrExpr::emit()
+{
   if(!typeIsBool(l->getType()) || !typeIsBool(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* OrExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -61,16 +61,16 @@ std::string OrExpr::getType()
 
 AndExpr::AndExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* AndExpr::emit()
+{
   if(!typeIsBool(l->getType()) || !typeIsBool(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* AndExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -115,16 +115,16 @@ std::string AndExpr::getType()
 
 EqualToExpr::EqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* EqualToExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* EqualToExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -170,16 +170,16 @@ std::string EqualToExpr::getType()
 
 NotEqualToExpr::NotEqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* NotEqualToExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* NotEqualToExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -224,16 +224,16 @@ std::string NotEqualToExpr::getType()
 
 LessThanEqualToExpr::LessThanEqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* LessThanEqualToExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* LessThanEqualToExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -278,16 +278,16 @@ std::string LessThanEqualToExpr::getType()
 
 GreaterThanEqualToExpr::GreaterThanEqualToExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* GreaterThanEqualToExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* GreaterThanEqualToExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -330,16 +330,16 @@ std::string GreaterThanEqualToExpr::getType()
 
 LessThanExpr::LessThanExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* LessThanExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* LessThanExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -382,16 +382,16 @@ std::string LessThanExpr::getType()
 
 GreaterThanExpr::GreaterThanExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* GreaterThanExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* GreaterThanExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -436,16 +436,16 @@ std::string GreaterThanExpr::getType()
 
 AddExpr::AddExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* AddExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* AddExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -488,16 +488,16 @@ std::string AddExpr::getType()
 
 SubExpr::SubExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* SubExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* SubExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -544,16 +544,16 @@ std::string SubExpr::getType()
 
 MultExpr::MultExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* MultExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* MultExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -603,16 +603,16 @@ std::string MultExpr::getType()
 
 DivExpr::DivExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* DivExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* DivExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -662,16 +662,16 @@ std::string DivExpr::getType()
 
 ModExpr::ModExpr(Expression* l, Expression* r) : Expression(), l(l), r(r) 
 {
+}
+
+Register* ModExpr::emit()
+{
   if(!typeIsArithmetic(l->getType()) || !typeIsArithmetic(r->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform arithmetic on non-arithmetic types: "
     << l->getType() << " and " << r->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* ModExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -724,16 +724,16 @@ std::string ModExpr::getType()
 
 NotExpr::NotExpr(Expression* e) : Expression(), e(e) 
 {
+}
+
+Register* NotExpr::emit()
+{
   if(!typeIsBool(e->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform logical not on non-bool type: "
     << e->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* NotExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();
@@ -768,16 +768,16 @@ std::string NotExpr::getType()
 
 NegationExpr::NegationExpr(Expression* e) : Expression(), e(e) 
 {
+}
+
+Register* NegationExpr::emit()
+{
   if(!typeIsArithmetic(e->getType()))
   {
     std::cerr << "Syntax Error: Attempting to perform negation on non-arithmetic type: "
     << e->getType() << " at line number: "
       << SymbolTable::getInstance().getLineNumber() << std::endl;
   }
-}
-
-Register* NegationExpr::emit()
-{
   if(isConst())
   {
     Register* reg = RegisterPool::getInstance().getRegister();

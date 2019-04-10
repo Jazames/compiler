@@ -12,38 +12,28 @@
 
 class Block
 {
-private:
-	std::vector<Statement> statement_sequence;
 public:
-	void emit();
+  Block(StatementSequence* ss) : ss(ss) {}
+  void emit() {ss->emit();}
+private:
+	StatementSequence* ss;
 };
 
-class ConstantDeclaration
+
+
+/*
+struct ProcedureDeclaration
 {
 
 };
 
-class TypeDeclaration
+struct FunctionDeclaration
 {
 
 };
+*/
 
-class VariableDeclaration
-{
-
-};
-
-class ProcedureDeclaration
-{
-
-};
-
-class FunctionDeclaration
-{
-
-};
-
-
+/*
 class Program 
 {
 private:
@@ -56,7 +46,7 @@ private:
 public: 
 	Value emit();
 };
-
+*/
 
 
 
@@ -96,8 +86,76 @@ private:
 };
 
 
+
+class ConstantDeclaration
+{
+public:
+  ConstantDeclaration(std::string id, Expression* e) : id(id), e(e) {}
+  std::string id;
+  Expression* e;
+};
+
+class ConstantDeclList
+{
+public:
+  ConstantDeclList() : constant_decls() {}
+  std::vector<ConstantDeclaration* > constant_decls;
+};
+
+class TypeDeclaration
+{
+public:
+  TypeDeclaration(std::string id, Type* type) : id(id), type(type) {}
+  std::string id;
+  Type* type;
+};
+
+class TypeDeclList
+{
+public:
+  TypeDeclList() : type_decls() {}
+  std::vector<TypeDeclaration* > type_decls;
+};
+
+class VariableDeclaration
+{
+public:
+  VariableDeclaration(IdentList* ident_list, Type* type) : ident_list(ident_list), type(type) {}
+  IdentList* ident_list;
+  Type* type;
+};
+
+class VarDeclList
+{
+public:
+  VarDeclList() : variable_decls() {}
+  std::vector<VariableDeclaration* > variable_decls;
+};
+
+class ParameterLine
+{
+public:
+  ParameterLine(bool isRef, IdentList* ident_list, Type* type) : isRef(isRef), ident_list(ident_list), type(type) {}
+  bool isRef;
+  IdentList* ident_list;
+  Type* type;
+};
+
+class FormalParameters 
+{
+public:
+  FormalParameters() : params() {}
+  std::vector<ParameterLine* > params;
+};
+
+
+
+
 //Functions:
+void addDeclarations(ConstantDeclList* constant_decl_list, TypeDeclList* type_decl_list, VarDeclList* var_decl_list);
+
 void addVarsToSymbolTable(IdentList* identList, Type* type);
 void addConstantToSymbolTable(std::string id, Expression* e);
 
+void createProcedure(std::string id, FormalParameters* params, Block* body);
 #endif

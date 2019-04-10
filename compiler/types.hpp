@@ -16,7 +16,7 @@ public:
   SimpleType(std::string id);// : Type(), id(id), size(4) {}
   SimpleType(std::string id, int size) : Type(), id(id), size(size) {}
   std::string getTypeID() override {return id;}// SymbolTable::getInstance().retrieveTypeSymbol(id)->getTypeID();}
-  int getSize() override {return size;}
+  int getSize() override;// {return size;}
 private:
   std::string id;
   int size;

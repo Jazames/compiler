@@ -12,7 +12,8 @@ int main()
   //Output header information.
   std::cout << "#Header\n";
   std::cout << ".globl main\n" << ".text\n" << "main:\n";
-  std::cout << "la $gp, GlobalArea\n\n"; //Perhaps this needs to be removed? 
+  std::cout << "la $gp, GlobalArea\n"; 
+  std::cout << "j realmain\n\n";
 
   //Setup Symbol Table. 
   SymbolTable& sym_tab = SymbolTable::getInstance();

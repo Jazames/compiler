@@ -30,6 +30,15 @@ RecordList* record_list;
 StatementSequence* stmt_sequence;
 ElseIfSequence* elsif_sequence;
 ElseSequence* else_sequence;
+Block* block;
+VariableDeclaration* var_decl;
+ConstantDeclaration* const_decl;
+TypeDeclaration* type_decl;
+VarDeclList* var_decl_list;
+ConstantDeclList* const_decl_list;
+TypeDeclList* type_decl_list;
+FormalParameters* formal_param;
+ParameterLine* param_line;
 }
 
 %token ARRAY_TOKEN
@@ -128,6 +137,22 @@ ElseSequence* else_sequence;
 %type <stmt> NullStatement
 %type <elsif_sequence> ElseIfSequence
 %type <else_sequence> ElseSequence
+%type <block> Block
+%type <var_decl> VarDecl
+%type <const_decl> ConstantDecl
+%type <type_decl> TypeDecl
+%type <var_decl_list> VarDeclList
+%type <var_decl_list> VarDeclSection
+%type <const_decl_list> ConstantDeclList
+%type <const_decl_list> ConstantDeclSection
+%type <type_decl_list> TypeDeclList
+%type <type_decl_list> TypeDeclSection
+%type <formal_param> FormalParameters
+%type <formal_param> ParameterList
+%type <param_line> ParameterLine
+%type <block> Body
+
+
 
 
 %left OR_TOKEN
@@ -140,25 +165,29 @@ ElseSequence* else_sequence;
  
 %%
 
-Program : ConstantDeclSection TypeDeclSection VarDeclSection ProFuncDeclSection Block DOT_TOKEN {}
+Program : ProgramDecls ProFuncDeclSection Block DOT_TOKEN {std::cout << "realmain:\n\n"; $3->emit();}
         ;
 
-ConstantDeclSection : CONST_TOKEN ConstantDeclList {}
-                    | {}
-                    ;
-ConstantDeclList : ConstantDeclList ConstantDecl {}
-                 | {}
-                 ;
-ConstantDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Expression SEMICOLON_TOKEN {addConstantToSymbolTable($1, $3);}
+ProgramDecls : ConstantDeclSection TypeDeclSection VarDeclSection {/*addDeclarations($1, $2, $3);*/}
              ;
 
-TypeDeclSection : TYPE_TOKEN TypeDeclList
-                | {}
-                ;
-TypeDeclList : TypeDeclList TypeDecl {}
-             | {}
+
+ConstantDeclSection : CONST_TOKEN ConstantDeclList {$$ = $2;}
+                    | {$$ = nullptr;}
+                    ;
+ConstantDeclList : ConstantDeclList ConstantDecl {$$ = $1; $$->constant_decls.push_back($2);}
+                 | {$$ = new ConstantDeclList();}
+                 ;
+ConstantDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Expression SEMICOLON_TOKEN {$$ = new ConstantDeclaration($1, $3); addConstantToSymbolTable($1, $3);}
              ;
-TypeDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Type SEMICOLON_TOKEN {SymbolTable::getInstance().addType($1, $3);}
+
+TypeDeclSection : TYPE_TOKEN TypeDeclList {$$ = $2;}
+                | {$$ = nullptr;}
+                ;
+TypeDeclList : TypeDeclList TypeDecl {$$ = $1; $$->type_decls.push_back($2);}
+             | {$$ = new TypeDeclList();}
+             ;
+TypeDecl : IDENTIFIER_TOKEN EQUAL_TOKEN Type SEMICOLON_TOKEN {$$ = new TypeDeclaration($1, $3); SymbolTable::getInstance().addType($1, $3);}
          ;
 Type : SimpleType {$$ = $1;}
      | RecordType {}
@@ -178,13 +207,13 @@ IdentList : IDENTIFIER_TOKEN  {$$ = new IdentList($1);}
           | IDENTIFIER_TOKEN COMMA_TOKEN IdentList {$3->addIdent($1); $$ = $3;}
           ;
 
-VarDeclSection : VAR_TOKEN VarDeclList {}
-               | {}
+VarDeclSection : VAR_TOKEN VarDeclList {$$ = $2;}
+               | {$$ = nullptr;}
                ;
-VarDeclList : VarDeclList VarDecl {}
-            | {}
+VarDeclList : VarDeclList VarDecl {$$ = $1; $$->variable_decls.push_back($2);}
+            | {$$ = new VarDeclList();}
             ;
-VarDecl : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {addVarsToSymbolTable($1, $3);}
+VarDecl : IdentList COLON_TOKEN Type SEMICOLON_TOKEN {$$ = new VariableDeclaration($1, $3); addVarsToSymbolTable($1, $3);}
         ;
 
 ProFuncDeclSection : ProFuncDeclList {}
@@ -193,27 +222,29 @@ ProFuncDeclList : ProFuncDeclList ProcedureDecl {}
                 | ProFuncDeclList FunctionDecl {}
                 | {}
                 ;
-ProcedureDecl : PROCEDURE_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
-              | PROCEDURE_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {}
+ProcedureDecl : ProcToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
+              | ProcToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {createProcedure($2, $4, $7);SymbolTable::getInstance().leaveScope();}
               ;
-FunctionDecl : FUNCTION_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
-             | FUNCTION_TOKEN IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {}
+ProcToke : PROCEDURE_TOKEN {SymbolTable::getInstance().enterScope();}
+         ;
+FunctionDecl : FuncToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
+             | FuncToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {}
              ;
+FuncToke : FUNCTION_TOKEN {}
+         ;
 FormalParameters : ParameterList {}
                  | {} 
                  ;
-ParameterList : ParameterLine {}
-              | ParameterLine SEMICOLON_TOKEN ParameterList {}
+ParameterList : ParameterLine {$$ = new FormalParameters(); $$->params.push_back($1);}
+              | ParameterLine SEMICOLON_TOKEN ParameterList {$$ = $3; $$->params.push_back($1);}
               ;
-ParameterLine : VarOrRef IdentList COLON_TOKEN Type {}
+ParameterLine : VAR_TOKEN IdentList COLON_TOKEN Type {$$ = new ParameterLine(false, $2, $4);}
+              | REF_TOKEN IdentList COLON_TOKEN Type {$$ = new ParameterLine(true,  $2, $4);}
+              |           IdentList COLON_TOKEN Type {$$ = new ParameterLine(false, $1, $3);}
               ;
-VarOrRef : VAR_TOKEN {}
-         | REF_TOKEN {}
-         | {}
-         ;
-Body : ConstantDeclSection TypeDeclSection VarDeclSection Block {}
+Body : ConstantDeclSection TypeDeclSection VarDeclSection Block {$$ = $4;}
      ;
-Block : BEGIN_TOKEN StatementSequence END_TOKEN {$2->emit();}
+Block : BEGIN_TOKEN StatementSequence END_TOKEN {$$ = new Block($2);}
       ;
 
 StatementSequence : Statement {$$ = new StatementSequence($1);}
