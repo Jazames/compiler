@@ -847,9 +847,137 @@ std::string ParenthesisExpr::getType()
 }
 
 //Function call expression
+
 Register* FunctionCallExpr::emit()
 {
-  //TODO: Fill this in. 
+  //Todo before transferring control. 
+    //Save used registers
+    //Save Frame Pointer
+    //Save return address
+    //Put parameters on the stack
+    //Create place for return value. 
+    //Create place for local variables. 
+
+  auto regs = RegisterPool::getInstance().getUsedRegisters();
+  int adjust_stack_size = 12; //Room for return address, frame pointer, and return value
+  adjust_stack_size += regs.size() * 4;
+
+  int return_offset = 0;
+
+  if(el == nullptr)
+  {
+    //No parameters
+    std::cout << "addi $sp, $sp, " << -adjust_stack_size << "# Increase the stack\n";
+    pushRegs(regs, adjust_stack_size);
+
+    std::cout << "sw $ra, " << adjust_stack_size - 4 << "($sp)   # Save frame pointer\n";
+    std::cout << "sw $fp, " << adjust_stack_size - 8 << "($sp)   # Save return address\n";
+
+    std::cout << "ori $fp, $sp, 0    #set the frame pointer for the call\n";
+    std::cout << "jal " << id << " # Jump to function\n"; 
+
+    std::cout << "lw $ra, " << adjust_stack_size - 4 << "($sp)   # Retrieve return address\n";
+    std::cout << "lw $fp, " << adjust_stack_size - 8 << "($sp)   # Retrieve frame pointer\n";
+  }
+  else
+  {
+    //But there actually are parameters now. :'(
+
+    for(int i = 0; i < el->size(); i++)
+    {
+      std::string type = el->get(i)->getType();
+      int e_size = SymbolTable::getInstance().retrieveTypeSymbol(type)->getSize();
+      adjust_stack_size += e_size;
+
+      //Probably do more stuff here... like make instructions to copy values? 
+    }
+
+
+    std::cout << "addi $sp, $sp, " << -adjust_stack_size << "# Increase the stack\n";
+    pushRegs(regs, adjust_stack_size);
+    int parameter_offset_from_stack = 0;
+
+    for(int i = 0; i < el->size(); i++)
+    {
+
+      std::string type = el->get(i)->getType();
+      int e_size = SymbolTable::getInstance().retrieveTypeSymbol(type)->getSize();
+      Expression* e = el->get(i);
+
+      LValueExpr* rval = dynamic_cast<LValueExpr*>(e);
+
+      if(rval == nullptr)
+      { //Case that the expression isn't an lValue. 
+        Register* reg = e->emit();
+        std::cout << "sw " << reg->getAsm() << ", " << parameter_offset_from_stack << "($sp)      # Put value in stack offset.\n";
+        parameter_offset_from_stack += 4;
+        delete(reg);
+      }
+      else //But if the expression is an LValue, need to copy it all over. 
+      {
+        int temp = 0;
+        Register* reg = RegisterPool::getInstance().getRegister();
+        Register* rreg = rval->getLValue()->emitAddress();  
+        for(int i = 0; i < e_size; i+=4)
+        {
+          std::cout << "lw " << reg->getAsm() << ", " << i << "(" << rreg->getAsm() << ")     # obtain word at address\n";
+          std::cout << "sw " << reg->getAsm() << ", " << i + parameter_offset_from_stack << "($sp)     # put word in stack offset\n";   
+          temp += 4;
+        }
+        parameter_offset_from_stack += temp;
+        delete(reg);
+        delete(rreg);
+      }
+    }
+    return_offset = parameter_offset_from_stack;
+    std::cout << "sw $ra, " << adjust_stack_size - 4 << "($sp)   # Save frame pointer\n";
+    std::cout << "sw $fp, " << adjust_stack_size - 8 << "($sp)   # Save return address\n";
+
+    std::cout << "ori $fp, $sp, 0    #set the frame pointer for the call\n";
+    std::cout << "jal " << id << " # Jump to function\n"; 
+
+    std::cout << "lw $ra, " << adjust_stack_size - 4 << "($sp)   # Retrieve return address\n";
+    std::cout << "lw $fp, " << adjust_stack_size - 8 << "($sp)   # Retrieve frame pointer\n";
+
+
+    parameter_offset_from_stack = 0;
+    for(int i = 0; i < el->size(); i++)
+    {
+      std::string type = el->get(i)->getType();
+      int e_size = SymbolTable::getInstance().retrieveTypeSymbol(type)->getSize();
+      Expression* e = el->get(i);
+
+      LValueExpr* rval = dynamic_cast<LValueExpr*>(e);
+
+      bool isRef = SymbolTable::getInstance().getParamIsRefOfFunction(id, i);
+      if(rval != nullptr)
+      { //Need to copy things back if they're passed by ref. 
+        Register* reg = RegisterPool::getInstance().getRegister();
+        Register* rreg = rval->getLValue()->emitAddress();  
+        for(int i = 0; i < e_size; i+=4)
+        {
+          if(isRef) //Put the copy in. 
+          {
+            std::cout << "lw " << reg->getAsm() << ", " << i + parameter_offset_from_stack << "($sp)     # get word in stack offset\n";   
+            std::cout << "sw " << reg->getAsm() << ", " << i << "(" << rreg->getAsm() << ")     # store word at address of variable\n";
+          }
+          parameter_offset_from_stack += 4;
+        }
+        delete(reg);
+        delete(rreg);
+      }
+    }
+  }
+
+  //Get return value in register; //TODO: may need to worry about returning values of different sizes. 
+  Register* reg = RegisterPool::getInstance().getRegister(); 
+  std::cout << "lw " << reg->getAsm() << ", " << return_offset << "($sp)      # load return value\n";
+
+  popRegs(regs, adjust_stack_size);
+  std::cout << "addi $sp, $sp, " << adjust_stack_size << "# Decrease the stack\n";
+  std::cout << "\n";
+
+  return reg;
 }
 
 //Modifying expressions

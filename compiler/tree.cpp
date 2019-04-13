@@ -95,31 +95,100 @@ void addConstantToSymbolTable(std::string id, Expression* e)
 
 
 
-void createProcedure(std::string id, FormalParameters* params, Block* body)
+void createProcedure(std::string id, FormalParameters* params, Body* body)
 {
   std::cout << id << ":    #start of function\n";
+
+
 
   SymbolTable& sym_tab = SymbolTable::getInstance();
   int size = 0;
   int variable_number = 0;
-  for(int i = params->params.size() -1; i >= 0; i--)
-  {
-    //addVarsToSymbolTable(params->params[i]->ident_list, params->params[i]->type);
 
-    //Add parameters to the symbol table. 
-    std::string typeID = params->params[i]->type->getTypeID(); //sym_tab.retrieveTypeSymbol(type->getTypeID())->getTypeID();//type->getTypeID();
-    for(int j = params->params[i]->ident_list->getSize() - 1; j >= 0; j--)
+  if(params != nullptr)
+  {
+    //Put vars in symbol table. But do it backwards, so that the positions match the expression list. 
+    for(int i = params->params.size() -1; i >= 0; i--)
     {
-      sym_tab.addVariableWithOffset(params->params[i]->ident_list->get(j), typeID, (size)); //This is probably sufficient. Hopefully. 
-      size += params->params[i]->type->getSize();//Get the size first so that we're properly far from the frame pointer. 
-      //TODO: put information about parameters into some table about the function, because it's needed whenever there's a function call with a ref type. 
-      sym_tab.addParamIsRefToFunction(id, params->params[i]->isRef, variable_number++);
+      //addVarsToSymbolTable(params->params[i]->ident_list, params->params[i]->type); 
+
+      //Add parameters to the symbol table. 
+      std::string typeID = params->params[i]->type->getTypeID(); //sym_tab.retrieveTypeSymbol(type->getTypeID())->getTypeID();//type->getTypeID();
+      for(int j = params->params[i]->ident_list->getSize() - 1; j >= 0; j--)
+      {
+        sym_tab.addVariableWithOffset(params->params[i]->ident_list->get(j), typeID, (size));
+        size += params->params[i]->type->getSize();
+
+        //put information about parameters into some table about the function, because it's needed whenever there's a function call with a ref type. 
+        sym_tab.addParamIsRefToFunction(id, params->params[i]->isRef, variable_number++);
+      }
     }
   }
 
+  //Increase stack pointer the size of local variables. 
+
   body->emit();
 
-  //Todo Copy return value into right place? 
+  //Decrease stack pointer the size of local variables. 
+
+
+  std::cout << "jr $ra      # Return control\n";
+}
+
+
+void createFunction(std::string id, FormalParameters* params, Type* type, Body* body)
+{
+  std::cout << id << ":    #start of function\n";
+
+
+
+  SymbolTable& sym_tab = SymbolTable::getInstance();
+  int size = 0;
+  int variable_number = 0;
+  if(params != nullptr)
+  {
+    //Put vars in symbol table. But do it backwards, so that the positions match the expression list. 
+    for(int i = params->params.size() -1; i >= 0; i--)
+    {
+      //addVarsToSymbolTable(params->params[i]->ident_list, params->params[i]->type); 
+
+      //Add parameters to the symbol table. 
+      std::string typeID = params->params[i]->type->getTypeID(); //sym_tab.retrieveTypeSymbol(type->getTypeID())->getTypeID();//type->getTypeID();
+      for(int j = params->params[i]->ident_list->getSize() - 1; j >= 0; j--)
+      {
+        sym_tab.addVariableWithOffset(params->params[i]->ident_list->get(j), typeID, (size));
+        size += params->params[i]->type->getSize();
+
+        //put information about parameters into some table about the function, because it's needed whenever there's a function call with a ref type. 
+        sym_tab.addParamIsRefToFunction(id, params->params[i]->isRef, variable_number++);
+      }
+    }
+  }
+
+  //Set address offset of return value for function. 
+  sym_tab.setFunctionReturnOffset(size); //TODO: Possibly need to be able to return things that are not 4 bytes. 
+  sym_tab.setFunction(id);
+  sym_tab.setFunctionType(id, type->getTypeID());//Possibly need to look this up in the symbol table? 
+
+  //Increase stack pointer the size of local variables. 
+  int local_var_size = 0;
+  VarDeclList* var_list = body->getVarList();
+  if(var_list != nullptr)
+  {
+    for(int i = 0; i < var_list->variable_decls.size(); i++)
+    {
+      int type_size = var_list->variable_decls[i]->ident_list->getSize();
+      local_var_size += type_size * var_list->variable_decls[i]->type->getSize();
+    }
+  }
+
+  std::cout << "addi $sp, $sp, " << -local_var_size << "      #Increase stack for local variables\n";
+
+  body->emit();
+
+  std::cout << "_" << id << ":       #End of function " << id << "\n";
+  //Decrease stack pointer the size of local variables. 
+  std::cout << "addi $sp, $sp, " << local_var_size << "      #Decrease stack used for local variables\n";
 
   std::cout << "jr $ra      # Return control\n";
 }

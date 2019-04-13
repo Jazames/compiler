@@ -185,8 +185,7 @@ bool SymbolTable::doesVariableExist(std::string id)
 
 std::string SymbolTable::retrieveFunctionType(std::string id)
 {
-  //TODO: make this do soemthing real
-  return "integer";
+  return getFunctionType(id);
 }
 
 void SymbolTable::addFunction(std::string function)
@@ -211,6 +210,25 @@ bool SymbolTable::addVariableWithOffset(std::string name, std::string type, int 
   return true;
 }
 
+void SymbolTable::setFunctionReturnOffset(int offset)
+{
+  function_return_offset = offset;
+}
+
+int SymbolTable::getFunctionReturnOffset()
+{
+  return function_return_offset;
+}
+
+void SymbolTable::setFunctionType(std::string function, std::string type)
+{
+  function_type_map[function] = type;
+}
+
+std::string SymbolTable::getFunctionType(std::string function)
+{
+  return function_type_map[function];
+}
 
 std::pair<int,Variable> SymbolTable::retrieveVariableSymbolAndScope(std::string id)
 {

@@ -8,7 +8,7 @@
 void StatementSequence::emit() 
 {
   //Need to emit in reverse order, because statements are added last to first. 
-//  std::cerr << "Emitting statements in block. Size = " << list.size() << std::endl;
+  //std::cerr << "Emitting statements in block. Size = " << list.size() << std::endl;
   for(int i = list.size() - 1; i >= 0; i--)
   {
     if(list[i] != nullptr)
@@ -291,6 +291,20 @@ void For::emit()
   delete(lval);
 }
 
+
+void Return::emit() 
+{
+  if(e==nullptr)
+  {
+    //Transfer control. 
+    std::cout << "jr $ra      # Return control\n";
+  }
+  int fp_offset = SymbolTable::getInstance().getFunctionReturnOffset();
+  Register* reg = e->emit();
+  std::cout << "sw " << reg->getAsm() << ", " << fp_offset << "($fp)      #Store return value at correct place on stack.\n\n";
+  std::cout << "j _" << SymbolTable::getInstance().getFunction() << "       # Go to end of function fo rcleanup.\n";
+}
+
 Read::Read(LValueList* lvl)
 {
   for(int i = 0; i < lvl->size(); i++)
@@ -381,22 +395,6 @@ void Write::emit()
   //Once it's all cleaned up, deallocate the memory. 
 }
 
-void pushRegs(std::vector<std::string> regs, int stackAdjustment)
-{
-  for(int i = 0; i < regs.size(); i++)
-  {
-    std::cout << "sw " << regs[i] << ", " << stackAdjustment - 12 - (i * 4) << "($sp)    #Save register\n";
-  }
-}
-
-void popRegs(std::vector<std::string> regs, int stackAdjustment)
-{
-  for(int i = 0; i < regs.size(); i++)
-  {
-    std::cout << "lw " << regs[i] << ", " << stackAdjustment - 12 - (i * 4) << "($sp)    #Load register\n";
-  }
-}
-
 void ProcedureCall::emit()
 {
   //Todo before transferring control. 
@@ -408,7 +406,7 @@ void ProcedureCall::emit()
     //Create place for local variables. 
 
   auto regs = RegisterPool::getInstance().getUsedRegisters();
-  int adjust_stack_size = 8;
+  int adjust_stack_size = 12; //Need room for return address, frame pointer, and return value, even though return value isn't used. 
   adjust_stack_size += regs.size() * 4;
 
 

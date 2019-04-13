@@ -55,19 +55,28 @@ public:
   void addParamIsRefToFunction(std::string function, bool isRef, int param_position);
   bool getParamIsRefOfFunction(std::string function, int param_position);
   bool addVariableWithOffset(std::string name, std::string type, int fp_offset);
+  void setFunctionReturnOffset(int offset);
+  int getFunctionReturnOffset();
+  void setFunctionType(std::string function, std::string type);
+  std::string getFunctionType(std::string function);
+  void setFunction(std::string id) {current_function_id = id;}
+  std::string getFunction() {return current_function_id;}
 private:
 	int line_number;
   //int current_scope;
   int current_global_offset;
   int current_local_offset;
+  int function_return_offset;
+  std::string current_function_id;
   std::pair<int,Variable> retrieveVariableSymbolAndScope(std::string name);
   std::vector<std::map<std::string, Type*> > type_symbol_table;
   std::vector<std::map<std::string, Variable> > variable_symbol_table;
   std::map<std::string, std::string> literal_table;
 
   std::map<std::string, std::map<int, bool> > function_map;
+  std::map<std::string, std::string> function_type_map;
 
-  SymbolTable() : line_number(1), current_global_offset(0), current_local_offset(0) {}
+  SymbolTable() : line_number(1), current_global_offset(0), current_local_offset(0), function_return_offset(0) {}
   ~SymbolTable() {}
 };
 

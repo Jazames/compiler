@@ -138,9 +138,10 @@ private:
 class Return : public Statement
 {
 public:
-
+  Return(Expression* e) : Statement(), e(e) {}
+  void emit() override;
 private:
-
+  Expression* e;
 };
 
 class Read : public Statement

@@ -31,6 +31,7 @@ StatementSequence* stmt_sequence;
 ElseIfSequence* elsif_sequence;
 ElseSequence* else_sequence;
 Block* block;
+Body* body;
 VariableDeclaration* var_decl;
 ConstantDeclaration* const_decl;
 TypeDeclaration* type_decl;
@@ -150,7 +151,7 @@ ParameterLine* param_line;
 %type <formal_param> FormalParameters
 %type <formal_param> ParameterList
 %type <param_line> ParameterLine
-%type <block> Body
+%type <body> Body
 
 
 
@@ -168,7 +169,7 @@ ParameterLine* param_line;
 Program : ProgramDecls ProFuncDeclSection Block DOT_TOKEN {std::cout << "\n\nrealmain:\n\n"; $3->emit();}
         ;
 
-ProgramDecls : ConstantDeclSection TypeDeclSection VarDeclSection {/*addDeclarations($1, $2, $3);*/}
+ProgramDecls : ConstantDeclSection TypeDeclSection VarDeclSection {std::cout << "j realmain\n\n";/*Needed here so that the program assigns constants before skipping functions.*/}
              ;
 
 
@@ -228,12 +229,12 @@ ProcedureDecl : ProcToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOS
 ProcToke : PROCEDURE_TOKEN {SymbolTable::getInstance().enterScope();}
          ;
 FunctionDecl : FuncToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
-             | FuncToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {}
+             | FuncToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN COLON_TOKEN Type SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {createFunction($2, $4, $7, $9); SymbolTable::getInstance().leaveScope();}
              ;
-FuncToke : FUNCTION_TOKEN {}
+FuncToke : FUNCTION_TOKEN {SymbolTable::getInstance().enterScope();}
          ;
-FormalParameters : ParameterList {}
-                 | {} 
+FormalParameters : ParameterList {$$ = $1;}
+                 | {$$ = nullptr;} 
                  ;
 ParameterList : ParameterLine {$$ = new FormalParameters(); $$->params.push_back($1);}
               | ParameterLine SEMICOLON_TOKEN ParameterList {$$ = $3; $$->params.push_back($1);}
@@ -242,7 +243,7 @@ ParameterLine : VAR_TOKEN IdentList COLON_TOKEN Type {$$ = new ParameterLine(fal
               | REF_TOKEN IdentList COLON_TOKEN Type {$$ = new ParameterLine(true,  $2, $4);}
               |           IdentList COLON_TOKEN Type {$$ = new ParameterLine(false, $1, $3);}
               ;
-Body : ConstantDeclSection TypeDeclSection VarDeclSection Block {$$ = $4;}
+Body : ConstantDeclSection TypeDeclSection VarDeclSection Block {$$ = new Body($1, $2, $3, $4);}
      ;
 Block : BEGIN_TOKEN StatementSequence END_TOKEN {$$ = new Block($2);}
       ;
@@ -282,8 +283,8 @@ ForStatement : FOR_TOKEN IDENTIFIER_TOKEN ASSIGNMENT_TOKEN Expression TO_TOKEN  
              ;
 StopStatement : STOP_TOKEN {$$ = new Stop();}
               ;
-ReturnStatement : RETURN_TOKEN Expression {}
-                | RETURN_TOKEN {}
+ReturnStatement : RETURN_TOKEN Expression {$$ = new Return($2);}
+                | RETURN_TOKEN {$$ = new Return(nullptr);}
                 ;
 ReadStatement : READ_TOKEN OPEN_PAREN_TOKEN LValueList CLOSE_PAREN_TOKEN {$$ = new Read($3);}
               ;

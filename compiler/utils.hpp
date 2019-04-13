@@ -63,4 +63,6 @@ bool typeIsChar(std::string type);
 bool typeIsBool(std::string type);
 bool typeIsArithmetic(std::string type);
 
+void pushRegs(std::vector<std::string> regs, int stackAdjustment);
+void popRegs(std::vector<std::string> regs, int stackAdjustment);
 #endif

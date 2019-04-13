@@ -159,3 +159,22 @@ bool typeIsArithmetic(std::string type)
 {
 	return typeIsInt(type) || typeIsChar(type) || typeIsBool(type);
 }
+
+
+
+
+void pushRegs(std::vector<std::string> regs, int stackAdjustment)
+{
+  for(int i = 0; i < regs.size(); i++)
+  {
+    std::cout << "sw " << regs[i] << ", " << stackAdjustment - 12 - (i * 4) << "($sp)    #Save register\n";
+  }
+}
+
+void popRegs(std::vector<std::string> regs, int stackAdjustment)
+{
+  for(int i = 0; i < regs.size(); i++)
+  {
+    std::cout << "lw " << regs[i] << ", " << stackAdjustment - 12 - (i * 4) << "($sp)    #Load register\n";
+  }
+}

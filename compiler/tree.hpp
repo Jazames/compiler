@@ -20,7 +20,6 @@ private:
 };
 
 
-
 /*
 struct ProcedureDeclaration
 {
@@ -132,6 +131,22 @@ public:
   std::vector<VariableDeclaration* > variable_decls;
 };
 
+
+class Body
+{
+public:
+  Body(ConstantDeclList* const_list, TypeDeclList* type_list, VarDeclList* var_list, Block* block) 
+    : const_list(const_list), type_list(type_list), var_list(var_list), block(block) {}
+  void emit() {block->emit();}
+  VarDeclList* getVarList() {return var_list;}
+private:
+  ConstantDeclList* const_list;
+  TypeDeclList* type_list;
+  VarDeclList* var_list;
+  Block* block;
+};
+
+
 class ParameterLine
 {
 public:
@@ -157,5 +172,6 @@ void addDeclarations(ConstantDeclList* constant_decl_list, TypeDeclList* type_de
 void addVarsToSymbolTable(IdentList* identList, Type* type);
 void addConstantToSymbolTable(std::string id, Expression* e);
 
-void createProcedure(std::string id, FormalParameters* params, Block* body);
+void createProcedure(std::string id, FormalParameters* params, Body* body);
+void createFunction(std::string id, FormalParameters* params, Type* type, Body* body);
 #endif
