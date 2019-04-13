@@ -225,6 +225,7 @@ if Id <=/>= endE branch startForLabel
 */
 void For::emit()
 {
+  bool added_to_stack = false;
   std::cout << "# For Statement\n";
   //Add variable. 
   SymbolTable& sym_tab = SymbolTable::getInstance();
@@ -232,6 +233,10 @@ void For::emit()
   if(!sym_tab.doesVariableExist(id))
   {
     sym_tab.addVariable(id, startE->getType());
+    //Need to make room on the stack if this is a local variable.
+    //TODO: only add to stack if local. 
+    std::cout << "addi $sp, $sp, -4    #Increase stack for For Loop variable\n";
+    added_to_stack = true;
   }
   LValue* lval = new IdentLValue(id);
   Expression* expr = new LValueExpr(lval);
@@ -239,9 +244,39 @@ void For::emit()
   Assignment ass(lval, startE);
   ass.emit();
 
+
+//Need to do initial check just in case it should never run. 
+  std::string end_label = getNewForLabel();
+  //Check if should never run for loop. 
+  if(downto)
+  {
+    //if regID < regEnd, then be done. 
+    LessThanExpr lesso(expr, endE);
+    Register* reg = lesso.emit();
+    std::cout << "bne " << reg->getAsm() << ", $zero, " << end_label << "     # skip for loop if finished check is true.\n\n";
+    delete(reg);
+    //std::cout << "bne " << regEnd->getAsm() << ", " << regId->getAsm() << ", " << for_label << "   # repeat for loop if not equal yet\n\n";
+  }
+  else
+  {
+    //if regID > regEnd, then be done. 
+    GreaterThanExpr greato(expr, endE);
+    Register* reg = greato.emit();
+    std::cout << "bne " << reg->getAsm() << ", $zero, " << end_label << "     # skip for loop if finished check is true.\n\n";
+    delete(reg);
+    //std::cout << "bne " << regEnd->getAsm() << ", " << regId->getAsm() << ", " << for_label << "   # repeat for loop if not equal yet\n\n";
+  }
+  
+
+
   //Throw out label. 
   std::string for_label = getNewForLabel();
   std::cout << for_label << ":      # Start of For Loop\n";
+
+
+
+
+
 
   //Throw out statements;
   ss->emit();
@@ -284,7 +319,14 @@ void For::emit()
     //std::cout << "bne " << regEnd->getAsm() << ", " << regId->getAsm() << ", " << for_label << "   # repeat for loop if not equal yet\n\n";
   }
   
+  std::cout << end_label << ":       #End of the for loop\n";
   //Clean up. 
+  if(added_to_stack)
+  {
+    //Need to remove room on the stack if this is a local variable.
+    //TODO: only add to stack if local. 
+    std::cout << "addi $sp, $sp, 4    #Increase stack for For Loop variable\n";
+  }
   //delete(regEnd);
   //delete(regId);
   delete(expr);
@@ -406,7 +448,7 @@ void ProcedureCall::emit()
     //Create place for local variables. 
 
   auto regs = RegisterPool::getInstance().getUsedRegisters();
-  int adjust_stack_size = 12; //Need room for return address, frame pointer, and return value, even though return value isn't used. 
+  int adjust_stack_size = 8; //Need room for return address, frame pointer, and return value, even though return value isn't used. 
   adjust_stack_size += regs.size() * 4;
 
 
@@ -462,14 +504,16 @@ void ProcedureCall::emit()
       }
       else //But if the expression is an LValue, need to copy it all over. 
       {
+        int temp = 0;
         Register* reg = RegisterPool::getInstance().getRegister();
         Register* rreg = rval->getLValue()->emitAddress();  
         for(int i = 0; i < e_size; i+=4)
         {
           std::cout << "lw " << reg->getAsm() << ", " << i << "(" << rreg->getAsm() << ")     # obtain word at address\n";
           std::cout << "sw " << reg->getAsm() << ", " << i + parameter_offset_from_stack << "($sp)     # put word in stack offset\n";   
-          parameter_offset_from_stack += 4;
+          temp += 4;
         }
+        parameter_offset_from_stack += temp;
         delete(reg);
         delete(rreg);
       }
@@ -497,14 +541,16 @@ void ProcedureCall::emit()
       bool isRef = SymbolTable::getInstance().getParamIsRefOfFunction(id, i);
       if(rval != nullptr && isRef)
       { //Need to copy things back if they're passed by ref. 
+        int temp = 0;
         Register* reg = RegisterPool::getInstance().getRegister();
         Register* rreg = rval->getLValue()->emitAddress();  
         for(int i = 0; i < e_size; i+=4)
         {
           std::cout << "lw " << reg->getAsm() << ", " << i + parameter_offset_from_stack << "($sp)     # get word in stack offset\n";   
           std::cout << "sw " << reg->getAsm() << ", " << i << "(" << rreg->getAsm() << ")     # store word at address of variable\n";
-          parameter_offset_from_stack += 4;
+          temp += 4;
         }
+        parameter_offset_from_stack += temp;
         delete(reg);
         delete(rreg);
       }

@@ -952,6 +952,7 @@ Register* FunctionCallExpr::emit()
       bool isRef = SymbolTable::getInstance().getParamIsRefOfFunction(id, i);
       if(rval != nullptr)
       { //Need to copy things back if they're passed by ref. 
+        int temp = 0;
         Register* reg = RegisterPool::getInstance().getRegister();
         Register* rreg = rval->getLValue()->emitAddress();  
         for(int i = 0; i < e_size; i+=4)
@@ -961,8 +962,9 @@ Register* FunctionCallExpr::emit()
             std::cout << "lw " << reg->getAsm() << ", " << i + parameter_offset_from_stack << "($sp)     # get word in stack offset\n";   
             std::cout << "sw " << reg->getAsm() << ", " << i << "(" << rreg->getAsm() << ")     # store word at address of variable\n";
           }
-          parameter_offset_from_stack += 4;
+          temp += 4;
         }
+        parameter_offset_from_stack += temp;
         delete(reg);
         delete(rreg);
       }

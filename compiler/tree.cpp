@@ -116,6 +116,7 @@ void createProcedure(std::string id, FormalParameters* params, Body* body)
       std::string typeID = params->params[i]->type->getTypeID(); //sym_tab.retrieveTypeSymbol(type->getTypeID())->getTypeID();//type->getTypeID();
       for(int j = params->params[i]->ident_list->getSize() - 1; j >= 0; j--)
       {
+        //std::cerr << "PUtting variable " << params->params[i]->ident_list->get(j) << " at offset " << size << std::endl;
         sym_tab.addVariableWithOffset(params->params[i]->ident_list->get(j), typeID, (size));
         size += params->params[i]->type->getSize();
 
@@ -125,14 +126,30 @@ void createProcedure(std::string id, FormalParameters* params, Body* body)
     }
   }
 
+  //Set which function is active.   
+  sym_tab.setFunction(id);
+
   //Increase stack pointer the size of local variables. 
+  int local_var_size = 0;
+  VarDeclList* var_list = body->getVarList();
+  if(var_list != nullptr)
+  {
+    for(int i = 0; i < var_list->variable_decls.size(); i++)
+    {
+      int type_size = var_list->variable_decls[i]->ident_list->getSize();
+      local_var_size += type_size * var_list->variable_decls[i]->type->getSize();
+    }
+  }
+
+  std::cout << "addi $sp, $sp, " << -local_var_size << "      #Increase stack for local variables\n";
 
   body->emit();
 
+  std::cout << "_" << id << ":       #End of function " << id << "\n";
   //Decrease stack pointer the size of local variables. 
+  std::cout << "addi $sp, $sp, " << local_var_size << "      #Decrease stack used for local variables\n";
 
-
-  std::cout << "jr $ra      # Return control\n";
+  std::cout << "jr $ra      # Return control\n\n\n";
 }
 
 
@@ -190,5 +207,5 @@ void createFunction(std::string id, FormalParameters* params, Type* type, Body* 
   //Decrease stack pointer the size of local variables. 
   std::cout << "addi $sp, $sp, " << local_var_size << "      #Decrease stack used for local variables\n";
 
-  std::cout << "jr $ra      # Return control\n";
+  std::cout << "jr $ra      # Return control\n\n\n";
 }
