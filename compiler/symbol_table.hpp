@@ -50,6 +50,11 @@ public:
   bool addStringConstant(std::string id, std::string type, std::string string_value);
   std::pair<int, std::string> getVariableOffsetAndBase(std::string name);
   bool doesVariableExist(std::string id);
+  std::string retrieveFunctionType(std::string id);
+  void addFunction(std::string function);
+  void addParamIsRefToFunction(std::string function, bool isRef, int param_position);
+  bool getParamIsRefOfFunction(std::string function, int param_position);
+  bool addVariableWithOffset(std::string name, std::string type, int fp_offset);
 private:
 	int line_number;
   //int current_scope;
@@ -59,7 +64,10 @@ private:
   std::vector<std::map<std::string, Type*> > type_symbol_table;
   std::vector<std::map<std::string, Variable> > variable_symbol_table;
   std::map<std::string, std::string> literal_table;
-  SymbolTable() : line_number(1), current_global_offset(0) {}
+
+  std::map<std::string, std::map<int, bool> > function_map;
+
+  SymbolTable() : line_number(1), current_global_offset(0), current_local_offset(0) {}
   ~SymbolTable() {}
 };
 

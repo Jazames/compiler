@@ -165,7 +165,7 @@ ParameterLine* param_line;
  
 %%
 
-Program : ProgramDecls ProFuncDeclSection Block DOT_TOKEN {std::cout << "realmain:\n\n"; $3->emit();}
+Program : ProgramDecls ProFuncDeclSection Block DOT_TOKEN {std::cout << "\n\nrealmain:\n\n"; $3->emit();}
         ;
 
 ProgramDecls : ConstantDeclSection TypeDeclSection VarDeclSection {/*addDeclarations($1, $2, $3);*/}
@@ -223,7 +223,7 @@ ProFuncDeclList : ProFuncDeclList ProcedureDecl {}
                 | {}
                 ;
 ProcedureDecl : ProcToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN FORWARD_TOKEN SEMICOLON_TOKEN {}
-              | ProcToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {createProcedure($2, $4, $7);SymbolTable::getInstance().leaveScope();}
+              | ProcToke IDENTIFIER_TOKEN OPEN_PAREN_TOKEN FormalParameters CLOSE_PAREN_TOKEN SEMICOLON_TOKEN     Body      SEMICOLON_TOKEN {createProcedure($2, $4, $7); SymbolTable::getInstance().leaveScope();}
               ;
 ProcToke : PROCEDURE_TOKEN {SymbolTable::getInstance().enterScope();}
          ;
@@ -295,8 +295,8 @@ WriteStatement : WRITE_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {
 ExpressionList : Expression {$$ = new ExpressionList($1);}
                | Expression COMMA_TOKEN ExpressionList {$3->addExpression($1); $$ = $3;}
                ;
-ProcedureCall : IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
-              | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
+ProcedureCall : IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {$$ = new ProcedureCall($1, $3);}
+              | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {$$ = new ProcedureCall($1, nullptr);}
               ;
 NullStatement : {$$ = new Null();}
               ;
@@ -317,8 +317,8 @@ Expression : Expression OR_TOKEN Expression {$$ = new OrExpr($1,$3);}
            | NOT_TOKEN Expression {$$ = new NotExpr($2);}
            | SUB_TOKEN Expression {$$ = new NegationExpr($2);}
            | OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN  {$$ = new ParenthesisExpr($2);}
-           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {}
-           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {}
+           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN ExpressionList CLOSE_PAREN_TOKEN {$$ = new FunctionCallExpr($1, $3);}
+           | IDENTIFIER_TOKEN OPEN_PAREN_TOKEN                CLOSE_PAREN_TOKEN {$$ = new FunctionCallExpr($1, nullptr);}
            | CHR_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new ChrExpr($3);}
            | ORD_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new OrdExpr($3);}
            | PRED_TOKEN OPEN_PAREN_TOKEN Expression CLOSE_PAREN_TOKEN {$$ = new PredExpr($3);}

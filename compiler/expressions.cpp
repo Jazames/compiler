@@ -137,9 +137,9 @@ Register* EqualToExpr::emit()
     Register* lreg = l->emit();
     Register* rreg = r->emit();
     Register* reg = RegisterPool::getInstance().getRegister();
-    std::cout << "subu " << reg->getAsm() << ", " << lreg->getAsm() << ", " << rreg->getAsm() << "      #Subtract two registers.\n";
-    std::cout << "sltu " << reg->getAsm() << ", $zero, " << reg->getAsm() << "      #See if result is zero.\n";
-    std::cout << "xori " << reg->getAsm() << ", " << reg->getAsm() << ", 1        #Flip the lsb to get what we want.\n";
+    std::cout << "seq " << reg->getAsm() << ", " << lreg->getAsm() << ", " << rreg->getAsm() << "      #Subtract two registers.\n";
+    //std::cout << "sltu " << reg->getAsm() << ", $zero, " << reg->getAsm() << "      #See if result is zero.\n";
+    //std::cout << "xori " << reg->getAsm() << ", " << reg->getAsm() << ", 1        #Flip the lsb to get what we want.\n";
     delete(rreg);
     delete(lreg);
     return reg;
@@ -847,7 +847,10 @@ std::string ParenthesisExpr::getType()
 }
 
 //Function call expression
-
+Register* FunctionCallExpr::emit()
+{
+  //TODO: Fill this in. 
+}
 
 //Modifying expressions
 

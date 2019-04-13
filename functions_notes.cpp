@@ -207,7 +207,7 @@ addresses of variables given in parenthesis after varibale declarations.
 .globl main 
 main: j realmain
 swap: 
-	$addi $sp, $sp, -8 # a @ 0($fp), b @ 4($sp)
+	$addi $sp, $sp, -8 # a @ 0($fp), b @ 4($fp)
 	lw $t0, 0($fp) #address of a
 	lw $t1, 0($t0) 
 	sw $t1, -8($fp)

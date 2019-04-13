@@ -97,5 +97,29 @@ void addConstantToSymbolTable(std::string id, Expression* e)
 
 void createProcedure(std::string id, FormalParameters* params, Block* body)
 {
-  
+  std::cout << id << ":    #start of function\n";
+
+  SymbolTable& sym_tab = SymbolTable::getInstance();
+  int size = 0;
+  int variable_number = 0;
+  for(int i = params->params.size() -1; i >= 0; i--)
+  {
+    //addVarsToSymbolTable(params->params[i]->ident_list, params->params[i]->type);
+
+    //Add parameters to the symbol table. 
+    std::string typeID = params->params[i]->type->getTypeID(); //sym_tab.retrieveTypeSymbol(type->getTypeID())->getTypeID();//type->getTypeID();
+    for(int j = params->params[i]->ident_list->getSize() - 1; j >= 0; j--)
+    {
+      sym_tab.addVariableWithOffset(params->params[i]->ident_list->get(j), typeID, (size)); //This is probably sufficient. Hopefully. 
+      size += params->params[i]->type->getSize();//Get the size first so that we're properly far from the frame pointer. 
+      //TODO: put information about parameters into some table about the function, because it's needed whenever there's a function call with a ref type. 
+      sym_tab.addParamIsRefToFunction(id, params->params[i]->isRef, variable_number++);
+    }
+  }
+
+  body->emit();
+
+  //Todo Copy return value into right place? 
+
+  std::cout << "jr $ra      # Return control\n";
 }

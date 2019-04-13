@@ -27,6 +27,7 @@ public:
 	Register* getRegister();
 	static RegisterPool& getInstance() {static RegisterPool instance; return instance;}
 	void print() {for(int i=0;i<register_pool.size();i++){std::cout << i << ":" << register_pool[i] << "\n";}}
+	std::vector<std::string> getUsedRegisters();
 private:
 	RegisterPool();
 	RegisterPool(int size);

@@ -21,17 +21,6 @@ private:
   std::vector<LValue*> lvalue_list;
 };
 
-class ExpressionList 
-{
-public:
-  ExpressionList(Expression* e) {expression_list.push_back(e);}
-  ExpressionList* addExpression(Expression* e) {expression_list.insert(expression_list.begin(),e);}
-  int size() {return expression_list.size();}
-  Expression* get(int pos) {return expression_list[pos];}
-private:
-  std::vector<Expression*> expression_list;
-};
-
 
 class Statement
 {
@@ -175,9 +164,11 @@ private:
 class ProcedureCall : public Statement
 {
 public:
-
+  ProcedureCall(std::string id, ExpressionList* el) : Statement(), id(id), el(el) {}
+  void emit() override;
 private:
-
+  ExpressionList* el;
+  std::string id;
 };
 
 class Null : public Statement

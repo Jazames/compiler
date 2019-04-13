@@ -91,6 +91,27 @@ Register* RegisterPool::getRegister()
 	exit(0);
 }
 
+
+std::vector<std::string> RegisterPool::getUsedRegisters()
+{
+	std::vector<std::string> used_regs;
+	for(int i = 0; i < pool_size; i++)
+	{
+		if(register_pool[i] != 0)
+		{
+			used_regs.push_back("$t" + std::to_string(i));
+		}
+	}
+	for(int i = 0; i < saved_pool_size; i++)
+	{
+		if(saved_register_pool[i] != 0)
+		{
+			used_regs.push_back("$s" + std::to_string(i));
+		}
+	}
+	return used_regs;
+}
+
 //Helper Functions
 char charStringToChar(std::string s_val)
 {

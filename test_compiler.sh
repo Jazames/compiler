@@ -3,7 +3,7 @@
 trap "exit" INT
 
 OUTDIRECTORY="OutputFromTest"
-INDIRECTORY="TestFiles/tested/" #function/" #control/" #simple_expressions/"  #udt/"
+INDIRECTORY="TestFiles/function/" #control/" #simple_expressions/"  #udt/"
 
 #make a build directory if it doesn't exist. 
 if [ ! -d "$OUTDIRECTORY" ]; then

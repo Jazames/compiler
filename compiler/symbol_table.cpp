@@ -15,9 +15,18 @@ bool SymbolTable::addStringLiteral(std::string name, std::string string)
 
 bool SymbolTable::addVariable(std::string name, std::string type)
 {
-  Variable variable(false, type, current_global_offset, 0);
-  current_global_offset += retrieveTypeSymbol(type)->getSize();
-  variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
+  if(variable_symbol_table.size() > 2)
+  {
+    current_local_offset -= retrieveTypeSymbol(type)->getSize();
+    Variable variable(false, type, current_local_offset, 0);
+    variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
+  }
+  else
+  {
+    Variable variable(false, type, current_global_offset, 0);
+    current_global_offset += retrieveTypeSymbol(type)->getSize();
+    variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
+  }
   return true;
 }
 
@@ -27,7 +36,7 @@ bool SymbolTable::addVariableConstant(std::string name, std::string type, ConstV
   if(variable_symbol_table.size() > 2)
   {
     variable = Variable(true, type, current_local_offset, value);
-    current_local_offset += retrieveTypeSymbol(type)->getSize();
+    current_local_offset -= retrieveTypeSymbol(type)->getSize();
   }
   else
   {
@@ -143,7 +152,7 @@ bool SymbolTable::addStringConstant(std::string id, std::string type, std::strin
   if(variable_symbol_table.size() > 2)
   {
     variable = Variable(true, type, current_local_offset, 0);
-    current_local_offset += retrieveTypeSymbol(type)->getSize();
+    current_local_offset -= retrieveTypeSymbol(type)->getSize();
   }
   else
   {
@@ -173,6 +182,35 @@ bool SymbolTable::doesVariableExist(std::string id)
   }
   return false;
 }
+
+std::string SymbolTable::retrieveFunctionType(std::string id)
+{
+  //TODO: make this do soemthing real
+  return "integer";
+}
+
+void SymbolTable::addFunction(std::string function)
+{
+  //function_map[function] = 
+}
+
+void SymbolTable::addParamIsRefToFunction(std::string function, bool isRef, int param_position)
+{
+  function_map[function][param_position] = isRef;
+}
+
+bool SymbolTable::getParamIsRefOfFunction(std::string function, int param_position)
+{
+  return function_map[function][param_position];
+}
+
+bool SymbolTable::addVariableWithOffset(std::string name, std::string type, int fp_offset)
+{
+  Variable variable(false, type, fp_offset, 0);
+  variable_symbol_table[variable_symbol_table.size()-1][name] = variable;
+  return true;
+}
+
 
 std::pair<int,Variable> SymbolTable::retrieveVariableSymbolAndScope(std::string id)
 {

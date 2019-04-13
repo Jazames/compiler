@@ -26,6 +26,18 @@ private:
 
 };
 
+class ExpressionList 
+{
+public:
+  ExpressionList(Expression* e) {expression_list.push_back(e);}
+  ExpressionList* addExpression(Expression* e) {expression_list.insert(expression_list.begin(),e);}
+  int size() {return expression_list.size();}
+  Expression* get(int pos) {return expression_list[pos];}
+private:
+  std::vector<Expression*> expression_list;
+};
+
+
 class OrExpr : public Expression
 {
 public:
@@ -221,9 +233,14 @@ private:
 class FunctionCallExpr : public Expression
 {
 public:
-  
+  FunctionCallExpr(std::string id, ExpressionList* el) : Expression(), id(id), el(el) {}
+  Reg* emit() override;
+  bool isConst() override {return false;}
+  Value getValue() override {return 0;}
+  std::string getType() override {return SymbolTable::getInstance().retrieveFunctionType(id);}
 private:
-  
+  std::string id;
+  ExpressionList* el;
 };
 
 class ChrExpr : public Expression
